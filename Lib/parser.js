@@ -8,19 +8,9 @@ class Parser
         return str.length === 1 && str.match(/\s/i);
     }
 
-    static #isLetter(str) 
-    {
-        return str.length === 1 && str.match(/[a-zA-Z]/i);
-    }
-
     static #isAtomNameSymbol(str)
     {
         return str.length === 1 && str.match(/[a-z0-9]/i);
-    }
-
-    static #isDigit(str) 
-    {
-        return str.length === 1 && str.match(/[0-9]/i);
     }
 
     #stream = null;
