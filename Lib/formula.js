@@ -42,6 +42,35 @@ class Formula
         }
     }
 
+    static copy(other)
+    {
+        switch (other.opc)
+        {
+            case Formula.Operator.TRUE:
+            case Formula.Operator.FALSE:
+                return new Formula(other.opc);
+
+            case Formula.Operator.ATOM:
+                return new Formula(other.name);
+
+            case Formula.Operator.NOT:
+            case Formula.Operator.X:
+            case Formula.Operator.F:
+            case Formula.Operator.G:
+                return Formula.unary(other.opc, Formula.copy(other.lop));
+
+            case Formula.Operator.AND:
+            case Formula.Operator.OR:
+            case Formula.Operator.IMPL:
+            case Formula.Operator.U:
+            case Formula.Operator.W:
+            case Formula.Operator.R:
+                return Formula.binary(other.opc, Formula.copy(other.lop), Formula.copy(other.rop));
+        }
+
+        return null;
+    }
+
     static Operator = Object.freeze(
         {
             TRUE: 0,
@@ -79,6 +108,16 @@ class Formula
             throw new Error(`Parameter must be \"number\" or \"string\", but \"${typeof operator}\" given`);
     }
 
+    static true()
+    {
+        return new Formula(Formula.Operator.TRUE);
+    }
+
+    static false()
+    {
+        return new Formula(Formula.Operator.FALSE);
+    }
+
     static unary(opc, operand)
     {
         let node = new Formula(opc);
@@ -97,7 +136,9 @@ class Formula
     equals(other)
     {
         let node_equals = (this.opc == other.opc && this.name == other.name);
-        return node_equals;
+        let lop_equals = (this.lop == null && other.lop == null) || (this.lop != null && other.lop != null && this.lop.equals(other.lop));
+        let rop_equals = (this.rop == null && other.rop == null) || (this.rop != null && other.rop != null && this.rop.equals(other.rop));
+        return node_equals && lop_equals && rop_equals;
     }
 
     static #need_wrapping(opc, nested_opc)
