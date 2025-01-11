@@ -18,13 +18,17 @@ class Solver
         return this.transformation_steps[this.transformation_steps.length - 1];
     }
 
-    constructor(ltl)
+    #variables = [];
+    #subltls = [];
+
+    get all_subltls()
     {
-        if (typeof ltl === "string")
-        {
-            let parser = new Parser();
-            this.#initial_ltl = parser.parse(ltl);
-        }
+        return this.#variables.concat(this.#subltls);
+    }
+
+    constructor()
+    {
+        
     }
 
     propagate_X(ltl, branch_X_count = 0)
@@ -230,16 +234,51 @@ class Solver
         this.transformation_steps = tmp;
     }
 
-    solve()
+    find_variables(ltl=null)
     {
+        if (ltl == null)
+            ltl = this.ltl;
+
+        if (ltl.lop)
+            this.find_variables(ltl.lop);
+
+        if (ltl.rop)
+            this.find_variables(ltl.rop);
+
+        if (
+            (ltl.opc == Formula.Operator.ATOM || ltl.opc == Formula.Operator.X) &&
+            !this.#variables.some((variable) => variable.equals(ltl))
+        )
+            this.#variables.push(ltl);
+
+        else if (
+            (ltl.opc != Formula.Operator.ATOM && ltl.opc != Formula.Operator.X) &&
+            !this.#subltls.some((variable) => variable.equals(ltl))
+        )
+            this.#subltls.push(ltl);
+    }
+
+    solve(ltl)
+    {
+        if (typeof ltl === "string")
+        {
+            let parser = new Parser();
+            this.#initial_ltl = parser.parse(ltl);
+        }
+        else
+            return;
+
         this.transform();
+        this.find_variables();
     }
 }
 
-let solver = new Solver("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
-// let solver = new Solver("a R b");
-solver.solve();
+let solver = new Solver();
+solver.solve("Fa U Gb");
+//solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
 for (let i = 0; i < solver.transformation_steps.length; i++)
-{
     console.log(solver.transformation_steps[i].string);
-}
+
+console.log(`There is ${solver.all_subltls.length} variables`);
+for (let i = 0; i < solver.all_subltls.length; i++)
+    console.log(solver.all_subltls[i].string);
