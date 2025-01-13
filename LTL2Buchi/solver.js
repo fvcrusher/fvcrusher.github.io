@@ -59,6 +59,8 @@ class Solver
         return states;
     }
 
+    #definitions = [];
+
     constructor()
     {
         
@@ -267,6 +269,33 @@ class Solver
         this.transformation_steps = tmp;
     }
 
+    #update_definitions(ltl=null)
+    {
+        let initial_ltl = (ltl == null);
+        if (ltl == null)
+            ltl = this.ltl;
+
+        let found_in_childs = [];
+
+        if (ltl.lop)
+            found_in_childs = found_in_childs.concat(this.#update_definitions(ltl.lop));
+
+        if (ltl.rop)
+            found_in_childs = found_in_childs.concat(this.#update_definitions(ltl.rop));
+
+        if (found_in_childs.length == 0 && ltl.opc == Formula.Operator.U && !this.#definitions.some((elem) => ltl.equals(elem[0])))
+        {
+            if (initial_ltl)
+                this.#definitions.push([ltl, 0]);
+            else
+                this.#definitions.push([ltl, this.#definitions.length + 1]);
+
+            found_in_childs.push(ltl);
+        }
+
+        return found_in_childs;
+    }
+
     #parse_subltls(ltl=null)
     {
         if (ltl == null)
@@ -465,11 +494,15 @@ class Solver
             return;
 
         this.#transform();
-        for (let i = 0; i < solver.transformation_steps.length; i++)
-            console.log(`Step ${i + 1}: ${solver.transformation_steps[i].string}`);
+        let i = 0;
+        for (i = 0; i < this.transformation_steps.length; i++)
+            console.log(`Step ${i + 1}: ${this.transformation_steps[i].string}`);
+
+        for (let announced = this.#update_definitions(); announced.length != 0; announced = this.#update_definitions())
+            console.log(`Step ${++i}: ${this.ltl.def_string(this.#definitions)}`);
 
         this.#parse_subltls();
-        console.log(`Found ${solver.all_subltls.length} unique subltls: ${solver.all_subltls.map((subltl) => subltl.string).join("; ")}`);
+        console.log(`Found ${this.all_subltls.length} unique subltls: ${this.all_subltls.map((subltl) => subltl.def_string(this.#definitions)).join("; ")}`);
 
         let variables_mask = [];
         while (this.#iterate_mask(variables_mask))
@@ -479,6 +512,8 @@ class Solver
         }
 
         console.log(`Found ${this.states_count} states, max split depth is ${this.states_trees_depth}`);
+
+
     }
 }
 
@@ -486,4 +521,5 @@ let solver = new Solver();
 // solver.solve("Fa U Gb & c -> d");
 // solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
 // solver.solve("(p -> Xq) U (!p & q)");
-solver.solve("G(q -> (!p & X(!q U p)))");
+// solver.solve("G(q -> (!p & X(!q U p)))");
+solver.solve("Fp U Fq");

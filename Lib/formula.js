@@ -42,6 +42,30 @@ class Formula
         }
     }
 
+    static #definition_text(def_no, latex=false)
+    {
+        switch (def_no)
+        {
+            case 0: return latex ? "\\varphi" : "φ";
+            case 1: return latex ? "\\alpha" : "α";
+            case 2: return latex ? "\\beta" : "β";
+            case 3: return latex ? "\\gamma" : "γ";
+            case 4: return latex ? "\\delta" : "δ";
+            case 5: return latex ? "\\varepsilon" : "ε";
+            case 6: return latex ? "\\zeta" : "ζ";
+            case 7: return latex ? "\\eta" : "η";
+            case 8: return latex ? "\\vartheta" : "ϑ";
+            case 9: return latex ? "\\mu" : "μ";
+            case 10: return latex ? "\\nu" : "ν";
+            case 11: return latex ? "\\xi" : "ξ";
+            case 12: return latex ? "\\rho" : "ρ";
+            case 13: return latex ? "\\sigma" : "σ";
+            case 14: return latex ? "\\chi" : "χ";
+            case 15: return latex ? "\\psi" : "ψ";
+            case 16: return latex ? "\\omega" : "ω";
+        }
+    }
+
     static copy(other)
     {
         switch (other.opc)
@@ -150,10 +174,16 @@ class Formula
         )
     }
 
-    #to_string_internal(wrap=false, latex=false)
+    #to_string_internal(wrap=false, latex=false, definitions=[])
     {
         let wrap_lop = (this.lop != null && Formula.#need_wrapping(this.opc, this.lop.opc)) ? false : true;
         let wrap_rop = (this.rop != null && Formula.#need_wrapping(this.opc, this.rop.opc)) ? false : true;
+
+        for (let i = 0; i < definitions.length; i++)
+        {
+            if (this.equals(definitions[i][0]))
+                return Formula.#definition_text(definitions[i][1]);
+        }
 
         switch (this.opc)
         {
@@ -168,7 +198,7 @@ class Formula
             case Formula.Operator.X:
             case Formula.Operator.F:
             case Formula.Operator.G:
-                return `${Formula.text_of(this.opc, latex)}${this.lop.#to_string_internal(wrap_lop, latex)}`;
+                return `${Formula.text_of(this.opc, latex)}${this.lop.#to_string_internal(wrap_lop, latex, definitions)}`;
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
@@ -176,7 +206,7 @@ class Formula
             case Formula.Operator.U:
             case Formula.Operator.W:
             case Formula.Operator.R:
-                let res = `${this.lop.#to_string_internal(wrap_lop, latex)} ${Formula.text_of(this.opc, latex)} ${this.rop.#to_string_internal(wrap_rop, latex)}`;
+                let res = `${this.lop.#to_string_internal(wrap_lop, latex, definitions)} ${Formula.text_of(this.opc, latex)} ${this.rop.#to_string_internal(wrap_rop, latex, definitions)}`;
                 return wrap ? `(${res})` : res;
 
             default:
@@ -189,9 +219,19 @@ class Formula
         return this.#to_string_internal(false, false);
     }
 
+    def_string(definitions)
+    {
+        return this.#to_string_internal(false, false, definitions);
+    }
+
     get latex()
     {
         return this.#to_string_internal(false, true);
+    }
+
+    def_latex(definitions)
+    {
+        return this.#to_string_internal(false, true, definitions);
     }
 }
 
