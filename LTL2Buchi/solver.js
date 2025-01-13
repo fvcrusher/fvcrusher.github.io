@@ -26,6 +26,13 @@ class Solver
         return this.#variables.concat(this.#subltls);
     }
 
+    #states = [];
+
+    get states_count()
+    {
+        return this.#states.length;
+    }
+
     constructor()
     {
         
@@ -285,6 +292,132 @@ class Solver
         return true;
     }
 
+    #subltl_index(subltl)
+    {
+        return this.all_subltls.findIndex((elem, idx, array) => elem.equals(subltl));
+    }
+
+    #mask_repr(mask)
+    {
+        let mask_repr = "";
+        for (let i = 0; i < mask.length; i++)
+            mask_repr += mask[i] === undefined ? "\x1b[1;90m-\x1b[0m" : 
+                         mask[i] ? "\x1b[1;32m1\x1b[0m" : "\x1b[1;31m0\x1b[0m";
+
+        return mask_repr;
+    }
+
+    #calculate(all_mask, subltl=this.ltl)
+    {
+        let lvalue = (subltl.lop == null) ? undefined : this.#calculate(all_mask, subltl.lop);
+        let rvalue = (subltl.rop == null) ? undefined : this.#calculate(all_mask, subltl.rop);
+
+        let subltl_idx = this.#subltl_index(subltl);
+
+        let result = all_mask[subltl_idx];
+
+        switch (subltl.opc)
+        {
+            case Formula.Operator.TRUE:
+                result = true;
+                break;
+            case Formula.Operator.FALSE:
+                result = false;
+                break;
+
+            case Formula.Operator.ATOM:
+            case Formula.Operator.X:
+                result = all_mask[subltl_idx];
+                break;
+
+            case Formula.Operator.NOT:
+                result = (lvalue == undefined) ? undefined : !lvalue;
+                break;
+
+            case Formula.Operator.AND:
+                if (lvalue == true && rvalue == true)
+                    result = true;
+                else if (lvalue == false || rvalue == false)
+                    result = false;
+                break;
+
+            case Formula.Operator.OR:
+                if (lvalue == true || rvalue == true)
+                    result = true;
+                else if (lvalue == false && rvalue == false)
+                    result = false;
+                break;
+
+            case Formula.Operator.XOR:
+                if ((lvalue == true && rvalue == true) || (lvalue == false && rvalue == false))
+                    result = false;
+                else if ((lvalue == true && rvalue == false) || (lvalue == false && rvalue == true))
+                    result = true;
+                break;
+
+            case Formula.Operator.IMPL:
+                if (lvalue == false || rvalue == true)
+                    result = true;
+                else if (lvalue == true && rvalue == false)
+                    result = false;
+                break;
+
+            case Formula.Operator.U:
+                if (rvalue == true)
+                    result = true;
+                else if (lvalue == false && rvalue == false)
+                    result = false;
+                break;
+
+            case Formula.Operator.F:
+                if (lvalue == true)
+                    result = true;
+                break;
+
+            case Formula.Operator.G:
+                if (lvalue == false)
+                    result = false;
+                break;
+
+            case Formula.Operator.W:
+            case Formula.Operator.R:
+            default:
+                console.log(`Can not calculate operator ${subltl} directly`);
+                break;
+        }
+
+        console.assert(all_mask[subltl_idx] == undefined || all_mask[subltl_idx] == result);
+
+        all_mask[subltl_idx] = result;
+        return result;
+    }
+
+    #build_state(all_mask)
+    {
+        let state = []
+        for (let i = 0; i < all_mask.length; i++)
+            state.push(all_mask[i]);
+
+        this.#calculate(state);
+
+        console.log(`After calculate: ${this.#mask_repr(state)}`);
+
+        let undefined_state_idx = state.indexOf(undefined);
+
+        if (undefined_state_idx == -1)
+            this.#states.push(state);
+
+        else
+        {
+            console.assert(this.all_subltls[undefined_state_idx].opc == Formula.Operator.U);
+
+            state[undefined_state_idx] = false;
+            this.#build_state(state);
+            state[undefined_state_idx] = true;
+            this.#build_state(state);
+        }
+    }
+
     solve(ltl)
     {
         if (typeof ltl === "string")
@@ -302,14 +435,20 @@ class Solver
         while (this.#iterate_mask(variables_mask))
         {
             let all_mask = variables_mask.concat(Array(this.#subltls.length).fill(undefined));
-            console.log(all_mask);
+            // console.log(`before calculate :: all_mask = ${this.#mask_repr(all_mask)}`);
+            this.#build_state(all_mask);
+            // console.log(`after calculate  :: all_mask = ${this.#mask_repr(all_mask)}`)
         }
+
+        console.log(`Found ${this.states_count} states`);
     }
 }
 
 let solver = new Solver();
-solver.solve("Fa U Gb & c -> d");
-//solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
+// solver.solve("Fa U Gb & c -> d");
+// solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
+// solver.solve("(p -> Xq) U (!p & q)");
+solver.solve("G(q -> (!p & X(!q U p)))");
 for (let i = 0; i < solver.transformation_steps.length; i++)
     console.log(solver.transformation_steps[i].string);
 
