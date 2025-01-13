@@ -1,5 +1,6 @@
 import Parser from "../Lib/parser.js";
 import Formula from "../Lib/formula.js";
+import TreeNode from "./tree.js";
 
 class Solver
 {
@@ -26,11 +27,36 @@ class Solver
         return this.#variables.concat(this.#subltls);
     }
 
-    #states = [];
+    #states_trees = [];
 
     get states_count()
     {
-        return this.#states.length;
+        let sum = 0;
+        for (let i = 0; i < this.#states_trees.length; i++)
+            sum += this.#states_trees[i].leafs_count;
+
+        return sum;
+    }
+
+    get states_trees_depth()
+    {
+        let max = 0;
+        for (let i = 0; i < this.#states_trees.length; i++)
+        {
+            if (this.#states_trees[i].leafs_count > max)
+                max = this.#states_trees[i].leafs_count;
+        }
+
+        return max;
+    }
+
+    get states()
+    {
+        let states = [];
+        for (let i = 0; i < this.#states_trees.length; i++)
+            states = states.concat(this.#states_trees[i].leafs);
+
+        return states;
     }
 
     constructor()
@@ -392,7 +418,7 @@ class Solver
         return result;
     }
 
-    #build_state(all_mask)
+    #build_state(all_mask, top_level=true)
     {
         let state = []
         for (let i = 0; i < all_mask.length; i++)
@@ -400,22 +426,32 @@ class Solver
 
         this.#calculate(state);
 
-        console.log(`After calculate: ${this.#mask_repr(state)}`);
+        let node = new TreeNode(state);
 
         let undefined_state_idx = state.indexOf(undefined);
 
-        if (undefined_state_idx == -1)
-            this.#states.push(state);
-
-        else
+        if (undefined_state_idx != -1)
         {
             console.assert(this.all_subltls[undefined_state_idx].opc == Formula.Operator.U);
 
             state[undefined_state_idx] = false;
-            this.#build_state(state);
+            node.false_branch = this.#build_state(state, false);
             state[undefined_state_idx] = true;
-            this.#build_state(state);
+            node.true_branch = this.#build_state(state, false);
+            state[undefined_state_idx] = undefined;
         }
+
+        if (top_level)
+            this.#states_trees.push(node);
+        
+        return node;
+    }
+
+    #is_initial_state(state_no)
+    {
+        let state = this.states[state_no - 1];
+
+        return state[state.length - 1];
     }
 
     solve(ltl)
@@ -429,18 +465,20 @@ class Solver
             return;
 
         this.#transform();
+        for (let i = 0; i < solver.transformation_steps.length; i++)
+            console.log(`Step ${i + 1}: ${solver.transformation_steps[i].string}`);
+
         this.#parse_subltls();
+        console.log(`Found ${solver.all_subltls.length} unique subltls: ${solver.all_subltls.map((subltl) => subltl.string).join("; ")}`);
 
         let variables_mask = [];
         while (this.#iterate_mask(variables_mask))
         {
             let all_mask = variables_mask.concat(Array(this.#subltls.length).fill(undefined));
-            // console.log(`before calculate :: all_mask = ${this.#mask_repr(all_mask)}`);
             this.#build_state(all_mask);
-            // console.log(`after calculate  :: all_mask = ${this.#mask_repr(all_mask)}`)
         }
 
-        console.log(`Found ${this.states_count} states`);
+        console.log(`Found ${this.states_count} states, max split depth is ${this.states_trees_depth}`);
     }
 }
 
@@ -449,9 +487,3 @@ let solver = new Solver();
 // solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
 // solver.solve("(p -> Xq) U (!p & q)");
 solver.solve("G(q -> (!p & X(!q U p)))");
-for (let i = 0; i < solver.transformation_steps.length; i++)
-    console.log(solver.transformation_steps[i].string);
-
-console.log(`There is ${solver.all_subltls.length} subltls`);
-for (let i = 0; i < solver.all_subltls.length; i++)
-    console.log(solver.all_subltls[i].string);
