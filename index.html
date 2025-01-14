@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FVCrusher · LTL2Buchi</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        let LTL2Buchi = null;
+        import("./LTL2Buchi/solver.js").then((mod) => LTL2Buchi = mod);
+    </script>
+</head>
+<body>
+    <header>
+        <h1>FVCrusher</h1>
+    </header>
+    <main>
+        <div class="form-container">
+            <input type="text" id="textInput" placeholder="Enter your LTL...">
+            <button onclick="printText()">Solve</button>
+        </div>
+        <div id="output" class="output"></div>
+    </main>
+    <footer>
+        <p>2025</p>
+    </footer>
+    <script>
+        function printText() {
+            const inputField = document.getElementById("textInput");
+            const outputDiv = document.getElementById("output");
+            let solver = new LTL2Buchi.Solver();
+            solver.solve(inputField.value);
+            outputDiv.textContent = solver.transformation_steps.map((step) => `${step.string}`).join(" = ");
+            outputDiv.style.display = "block";
+        }
+    </script>
+</body>
+</html>

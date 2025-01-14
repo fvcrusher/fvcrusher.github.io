@@ -2,7 +2,7 @@ import Parser from "../Lib/parser.js";
 import Formula from "../Lib/formula.js";
 import TreeNode from "./tree.js";
 
-class Solver
+export class Solver
 {
     #initial_ltl = null;
     transformation_steps = [];
@@ -517,9 +517,9 @@ class Solver
     }
 }
 
-let solver = new Solver();
-// solver.solve("Fa U Gb & c -> d");
-// solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
-// solver.solve("(p -> Xq) U (!p & q)");
-// solver.solve("G(q -> (!p & X(!q U p)))");
-solver.solve("Fp U Fq");
+// let solver = new Solver();
+// // solver.solve("Fa U Gb & c -> d");
+// // solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
+// // solver.solve("(p -> Xq) U (!p & q)");
+// // solver.solve("G(q -> (!p & X(!q U p)))");
+// solver.solve("Fp U Fq");
