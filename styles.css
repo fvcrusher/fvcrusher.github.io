@@ -72,11 +72,14 @@ button:hover {
 /* Output Section */
 .output {
     margin-top: 20px;
+    margin: auto;
+    max-width: 60%;
     padding: 15px;
     background-color: #ededed;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1em;
+    line-height: 2.5;
     color: #333;
     display: none;
 }

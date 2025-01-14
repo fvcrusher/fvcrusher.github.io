@@ -42,7 +42,7 @@
             const outputDiv = document.getElementById("output");
             let solver = new LTL2Buchi.Solver();
             solver.solve(inputField.value);
-            outputDiv.textContent = `\$\\varphi \$ \$ = \$${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`;
+            outputDiv.textContent = `\$ \\varphi \$ \$ = \$ ${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`;
             outputDiv.style.display = "block";
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
