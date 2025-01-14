@@ -32,10 +32,12 @@
             <button onclick="run_solver()">Solve</button>
         </div>
         <div id="output" class="output">
-            <p><span>&#9888;</span> Данное решение не является истиной в 
-            последней инстанции, настоятельно рекомендуется при использовании 
-            проверять корректность. В случае обнаружения ошибок в решении 
-            рекомендуется завести issue в репозитории проекта</p>
+            <p class="warning">
+                <span>&#9888;</span> Данное решение не является истиной в 
+                последней инстанции, настоятельно рекомендуется при использовании 
+                проверять корректность. В случае обнаружения ошибок в решении 
+                рекомендуется завести issue в репозитории проекта
+            </p>
         </div>
     </main>
     <footer>
@@ -48,6 +50,7 @@
             let solver = new LTL2Buchi.Solver();
             solver.solve(inputField.value);
             let p = document.createElement("p");
+            p.classList.add("latex-string");
             let text = document.createTextNode(`\$ \\varphi \$ \$ = \$ ${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`);
             p.appendChild(text);
             outputDiv.appendChild(p);
