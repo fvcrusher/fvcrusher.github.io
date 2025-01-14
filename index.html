@@ -9,6 +9,18 @@
         let LTL2Buchi = null;
         import("./LTL2Buchi/solver.js").then((mod) => LTL2Buchi = mod);
     </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            jax: ["input/TeX", "output/HTML-CSS"],
+            extensions: ["tex2jax.js"],
+            "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] },
+            tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+            TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
+            messageStyle: "none"
+        });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
 </head>
 <body>
     <header>
@@ -17,7 +29,7 @@
     <main>
         <div class="form-container">
             <input type="text" id="textInput" placeholder="Enter your LTL...">
-            <button onclick="printText()">Solve</button>
+            <button onclick="run_solver()">Solve</button>
         </div>
         <div id="output" class="output"></div>
     </main>
@@ -25,13 +37,15 @@
         <p>2025</p>
     </footer>
     <script>
-        function printText() {
+        function run_solver() {
             const inputField = document.getElementById("textInput");
             const outputDiv = document.getElementById("output");
             let solver = new LTL2Buchi.Solver();
             solver.solve(inputField.value);
-            outputDiv.textContent = solver.transformation_steps.map((step) => `${step.string}`).join(" = ");
+            outputDiv.textContent = `\$\\varphi \$ \$ = \$${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`;
             outputDiv.style.display = "block";
+
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
         }
     </script>
 </body>
