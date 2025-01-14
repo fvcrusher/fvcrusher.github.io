@@ -51,6 +51,7 @@ input[type="text"] {
     border-radius: 5px;
     font-size: 1em;
     background-color: #f9f9f9;
+    box-sizing: border-box;
 }
 
 button {
@@ -73,7 +74,7 @@ button:hover {
 .output {
     margin-top: 20px;
     margin: auto;
-    max-width: 60%;
+    max-width: 60em;
     padding: 15px;
     background-color: #ededed;
     border: 1px solid #ccc;
