@@ -22,6 +22,16 @@ export class Solver
     #variables = [];
     #subltls = [];
 
+    get variables()
+    {
+        return this.#variables;
+    }
+
+    get variables_count()
+    {
+        return this.#variables.length;
+    }
+
     get all_subltls()
     {
         return this.#variables.concat(this.#subltls);

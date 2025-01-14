@@ -44,16 +44,24 @@
         <p>2025</p>
     </footer>
     <script>
+        function add_paragraph(container, text, latex=false) {
+            let par = document.createElement("p");
+            if (latex)
+                par.classList.add("latex-string");
+            let txt = document.createTextNode(text);
+            par.appendChild(txt);
+            container.appendChild(par);
+        }
+    </script>
+    <script>
         function run_solver() {
             const inputField = document.getElementById("textInput");
             const outputDiv = document.getElementById("output");
             let solver = new LTL2Buchi.Solver();
             solver.solve(inputField.value);
-            let p = document.createElement("p");
-            p.classList.add("latex-string");
-            let text = document.createTextNode(`\$ \\varphi \$ \$ = \$ ${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`);
-            p.appendChild(text);
-            outputDiv.appendChild(p);
+            add_paragraph(outputDiv, "В первую очередь преобразуем формулу: внесем оператор $\\mathbf{X}$ максимально глубоко в скобки, далее выразим операторы $\\mathbf{F}$, $\\mathbf{G}$, $\\mathbf{W}$, $\\mathbf{R}$ через оператор $$");
+            add_paragraph(outputDiv, `\$ \\varphi \$ \$ = \$ ${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`, true);
+            add_paragraph(outputDiv, `В полученной формуле необходимо выделить независимые подформулы (переменные и операции $\\mathbf{X}$). Таких подформул ${solver.variables_count}: ${solver.variables.map((variable) => `\$${variable.latex}\$`).join(", ")}.`)
             outputDiv.style.display = "block";
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
