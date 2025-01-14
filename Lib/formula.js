@@ -34,7 +34,7 @@ class Formula
             case Formula.Operator.AND: return latex ? "\\hspace{0.1cm}\\mathbf{\\wedge}\\hspace{0.1cm}" : "&";
             case Formula.Operator.OR: return latex ? "\\hspace{0.1cm}\\mathbf{\\vee}\\hspace{0.1cm}" : "|";
             case Formula.Operator.IMPL: return latex ? "\\hspace{0.1cm}\\mathbf{\\rightarrow}\\hspace{0.1cm}" : "->";
-            case Formula.Operator.XOR: return latex ? "\\hspace{0.1cm}\\oplus\\hspace{0.1cm}" : "+";
+            case Formula.Operator.XOR: return latex ? "\\hspace{0.1cm}\\mathbf{\\oplus}\\hspace{0.1cm}" : "+";
             case Formula.Operator.U: return latex ? "\\hspace{0.1cm}\\mathbf{U}\\hspace{0.1cm}" : "U";
             case Formula.Operator.R: return latex ? "\\hspace{0.1cm}\\mathbf{W}\\hspace{0.1cm}" : "R";
             case Formula.Operator.W: return latex ? "\\hspace{0.1cm}\\mathbf{R}\\hspace{0.1cm}" : "W";
