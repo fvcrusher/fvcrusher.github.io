@@ -135,9 +135,11 @@ export class Solver
         return this.#definitions;
     }
 
-    constructor()
+    #inversed_mask = false;
+
+    constructor(inversed_mask=false)
     {
-        
+        this.#inversed_mask = inversed_mask;
     }
 
     truth_list_for_mask(mask)
@@ -423,12 +425,12 @@ export class Solver
             return true;
         }
 
-        let last_false = mask.lastIndexOf(false)
-        if (last_false == -1)
+        let found_false = this.#inversed_mask ? mask.indexOf(false) : mask.lastIndexOf(false);
+        if (found_false == -1)
             return false;
 
-        mask[last_false] = true;
-        for (let i = last_false + 1; i < mask.length; i++)
+        mask[found_false] = true;
+        for (let i = found_false + (this.#inversed_mask ? -1 : 1); this.#inversed_mask ? (i >= 0) : (i < mask.length); i += this.#inversed_mask ? -1 : 1)
             mask[i] = false;
 
         return true;

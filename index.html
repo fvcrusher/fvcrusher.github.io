@@ -30,6 +30,7 @@
         <div class="form-container">
             <input type="text" id="textInput" placeholder="Введите LTL...">
             <label for="compactTable"><input type="checkbox" id="compactTable" name="compactTable" checked />Компактный вид таблицы</label>
+            <label for="inversedMask"><input type="checkbox" id="inversedMask" name="inversedMask" />Инвертировать порядок перебора</label>
             <button onclick="run_solver()">Решить</button>
         </div>
         <div id="output" class="output">
@@ -50,7 +51,7 @@
             par.classList.add("generated-output");
             if (latex)
                 par.classList.add("latex-string");
-            if (typeof text === "string") 
+            if (typeof text === "string")
             {
                 let txt = document.createTextNode(text);
                 par.appendChild(txt);
@@ -152,8 +153,10 @@
         function run_solver() {
             const inputField = document.getElementById("textInput");
             const compactFlag = document.getElementById("compactTable");
+            const inversedFlag = document.getElementById("inversedMask");
             const outputDiv = document.getElementById("output");
-            let solver = new LTL2Buchi.Solver();
+            
+            let solver = new LTL2Buchi.Solver(inversedFlag.checked);
             solver.solve(inputField.value);
 
             clear_output(outputDiv);
