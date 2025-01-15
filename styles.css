@@ -143,5 +143,11 @@ footer p {
 .tg .tg-0pky {
     border-color: inherit;
     text-align: left;
-    vertical-align: top
+    vertical-align: center;
+}
+
+.tg .tg-1pky {
+    border-color: inherit;
+    text-align: center;
+    vertical-align: center;
 }
