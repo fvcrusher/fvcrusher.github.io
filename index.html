@@ -38,6 +38,21 @@
                 проверять корректность. В случае обнаружения ошибок в решении 
                 рекомендуется завести issue в репозитории проекта
             </p>
+
+            <p>
+                <table class="tg">
+                    <thead>
+                        <tr>
+                            <th class="tg-0pky">p</th>
+                            <th class="tg-0pky">q</th>
+                            <th class="tg-0pky">Xq</th>
+                            <th class="tg-0pky"></th>
+                            <th class="tg-0pky"></th>
+                            <th class="tg-0pky"></th>
+                        </tr>
+                    </thead>
+                </table>
+            </p>
         </div>
     </main>
     <footer>
@@ -49,8 +64,13 @@
             par.classList.add("generated-output");
             if (latex)
                 par.classList.add("latex-string");
-            let txt = document.createTextNode(text);
-            par.appendChild(txt);
+            if (typeof text === "string") 
+            {
+                let txt = document.createTextNode(text);
+                par.appendChild(txt);
+            }
+            else
+                par.appendChild(text);
             container.appendChild(par);
         }
 
@@ -58,6 +78,35 @@
             let to_remove = container.getElementsByClassName("generated-output");
             while (to_remove.length > 0)
                 container.removeChild(to_remove[0]);
+        }
+
+        function generate_table(solver) {
+            let table = document.createElement("table");
+            table.classList.add("tg");
+            table.classList.add("generated-output");
+
+            let header = document.createElement("thead");
+            let tr = document.createElement("tr");
+
+            table.appendChild(header);
+            header.appendChild(tr);
+            
+            for (let i = 0; i < solver.variables_count; i++)
+            {
+                let cell = document.createElement("th");
+                cell.classList.add("tg-0pky");
+                cell.appendChild(document.createTextNode(`\$${solver.variables[i].latex}\$`))
+                tr.appendChild(cell);
+            }
+
+            for (let i = 0; i < solver.states_trees_depth; i++)
+            {
+                let cell = document.createElement("th");
+                cell.classList.add("tg-0pky");
+                tr.appendChild(cell);
+            }
+
+            return table;
         }
 
         function run_solver() {
@@ -70,7 +119,10 @@
 
             add_paragraph(outputDiv, "В первую очередь преобразуем формулу: внесем оператор $\\mathbf{X}$ максимально глубоко в скобки, далее выразим операторы $\\mathbf{F}$, $\\mathbf{G}$, $\\mathbf{W}$, $\\mathbf{R}$ через оператор $\\mathbf{U}$");
             add_paragraph(outputDiv, `\$ \\varphi \$ \$ = \$ ${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`, true);
-            add_paragraph(outputDiv, `В полученной формуле необходимо выделить независимые подформулы (переменные и операции $\\mathbf{X}$). Таких подформул ${solver.variables_count}: ${solver.variables.map((variable) => `\$${variable.latex}\$`).join(", ")}.`)
+            add_paragraph(outputDiv, `В полученной формуле необходимо выделить независимые подформулы (переменные и операции $\\mathbf{X}$). Таких подформул ${solver.variables_count}: ${solver.variables.map((variable) => `\$${variable.latex}\$`).join(", ")}. Составим таблицу истинности с расщеплениями.`);
+            
+            add_paragraph(outputDiv, generate_table(solver));
+
             outputDiv.style.display = "block";
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
