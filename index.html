@@ -28,8 +28,9 @@
     </header>
     <main>
         <div class="form-container">
-            <input type="text" id="textInput" placeholder="Enter your LTL...">
-            <button onclick="run_solver()">Solve</button>
+            <input type="text" id="textInput" placeholder="Введите LTL...">
+            <label for="compactTable"><input type="checkbox" id="compactTable" name="compactTable" checked />Компактный вид таблицы</label>
+            <button onclick="run_solver()">Решить</button>
         </div>
         <div id="output" class="output">
             <p class="warning">
@@ -65,7 +66,8 @@
                 container.removeChild(to_remove[0]);
         }
 
-        function generate_table(solver) {
+        function generate_table(solver, compact=false) {
+            console.log(compact);
             let table = document.createElement("table");
             table.classList.add("tg");
             table.classList.add("generated-output");
@@ -111,7 +113,27 @@
                     {
                         let td = document.createElement("td");
                         let truth_list = solver.truth_list_for_mask(states_table[line][column].data);
+
+                        if (compact && column > 0)
+                        {
+                            let mentioned_parent = line;
+                            while (states_table[mentioned_parent][column - 1] == null && mentioned_parent > 0)
+                                mentioned_parent--;
+
+                            let parent_truth_list = solver.truth_list_for_mask(states_table[mentioned_parent][column - 1].data);
+
+                            for (let i = 0; i < parent_truth_list.length; i++)
+                            {
+                                let list_idx = truth_list.findIndex((elem, idx, truth_list) => elem.equals(parent_truth_list[i]));
+                                if (list_idx != -1)
+                                    truth_list.splice(list_idx, 1);
+                            }
+                        }
+
                         let truth_list_str = (truth_list.length == 0) ? "$\\emptyset$" : truth_list.map((ltl) => `\$${ltl.def_latex(solver.definitions)}\$`).join(", ");
+
+                        if (compact && column > 0)
+                            truth_list_str = "\$+\$ " + truth_list_str;
 
                         if (column == states_table[line].length - 1)
                             truth_list_str = `\$\\mathbf{s_{${line + 1}}}\$: ` + truth_list_str;
@@ -129,6 +151,7 @@
 
         function run_solver() {
             const inputField = document.getElementById("textInput");
+            const compactFlag = document.getElementById("compactTable");
             const outputDiv = document.getElementById("output");
             let solver = new LTL2Buchi.Solver();
             solver.solve(inputField.value);
@@ -139,7 +162,7 @@
             add_paragraph(outputDiv, `\$ \\varphi \$ \$ = \$ ${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`, true);
             add_paragraph(outputDiv, `В полученной формуле необходимо выделить независимые подформулы (переменные и операции $\\mathbf{X}$). Таких подформул ${solver.variables_count}: ${solver.variables.map((variable) => `\$${variable.latex}\$`).join(", ")}. Составим таблицу истинности с расщеплениями.`);
             
-            add_paragraph(outputDiv, generate_table(solver));
+            add_paragraph(outputDiv, generate_table(solver, compactFlag.checked));
 
             outputDiv.style.display = "block";
 

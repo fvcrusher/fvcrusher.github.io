@@ -151,3 +151,8 @@ footer p {
     text-align: center;
     vertical-align: center;
 }
+
+[type="checkbox"]
+{
+    vertical-align:middle;
+}
