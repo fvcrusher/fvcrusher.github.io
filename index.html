@@ -86,13 +86,6 @@
                 tr.appendChild(cell);
             }
 
-            for (let i = 0; i < solver.states_trees_depth; i++)
-            {
-                let cell = document.createElement("th");
-                cell.classList.add("tg-0pky");
-                tr.appendChild(cell);
-            }
-
             let states_table = solver.raw_states_table();
 
             for (let line = 0; line < states_table.length; line++)
@@ -104,7 +97,14 @@
                 {
                     if (column == 0 && states_table[line][column] != null)
                     {
-                        // add atoms truth
+                        for (let atom_idx = 0; atom_idx < solver.variables_count; atom_idx++)
+                        {
+                            let td = document.createElement("td");
+                            td.appendChild(document.createTextNode(states_table[line][column].data[atom_idx] ? "$1$" : "$0$"));
+                            td.classList.add("tg-0pky");
+                            td.setAttribute("rowspan", states_table[line][column].leafs_count);
+                            tr.appendChild(td);
+                        }
                     }
 
                     if (states_table[line][column] != null)
