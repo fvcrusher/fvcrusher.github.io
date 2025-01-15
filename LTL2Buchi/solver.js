@@ -53,8 +53,8 @@ export class Solver
         let max = 0;
         for (let i = 0; i < this.#states_trees.length; i++)
         {
-            if (this.#states_trees[i].leafs_count > max)
-                max = this.#states_trees[i].leafs_count;
+            if (this.#states_trees[i].max_depth > max)
+                max = this.#states_trees[i].max_depth;
         }
 
         return max;
