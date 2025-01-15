@@ -112,6 +112,10 @@
                         let td = document.createElement("td");
                         let truth_list = solver.truth_list_for_mask(states_table[line][column].data);
                         let truth_list_str = (truth_list.length == 0) ? "$\\emptyset$" : truth_list.map((ltl) => `\$${ltl.def_latex(solver.definitions)}\$`).join(", ");
+
+                        if (column == states_table[line].length - 1)
+                            truth_list_str = `\$\\mathbf{s_{${line + 1}}}\$: ` + truth_list_str;
+
                         td.appendChild(document.createTextNode(truth_list_str));
                         td.classList.add("tg-0pky");
                         td.setAttribute("rowspan", states_table[line][column].leafs_count);
