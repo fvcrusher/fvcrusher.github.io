@@ -358,31 +358,23 @@ export class Solver
         this.transformation_steps = tmp;
     }
 
-    #update_definitions(ltl=null)
+    #collect_definitions(ltl=null)
     {
         let initial_ltl = (ltl == null);
         if (ltl == null)
             ltl = this.ltl;
 
-        let found_in_childs = [];
-
         if (ltl.lop)
-            found_in_childs = found_in_childs.concat(this.#update_definitions(ltl.lop));
+            this.#collect_definitions(ltl.lop);
 
         if (ltl.rop)
-            found_in_childs = found_in_childs.concat(this.#update_definitions(ltl.rop));
+            this.#collect_definitions(ltl.rop);
 
-        if (found_in_childs.length == 0 && ltl.opc == Formula.Operator.U && !this.#definitions.some((elem) => ltl.equals(elem[0])))
-        {
-            if (initial_ltl)
-                this.#definitions.push([ltl, 0]);
-            else
-                this.#definitions.push([ltl, this.#definitions.length + 1]);
+        if (initial_ltl)
+            this.#definitions.push([ltl, 0]);
 
-            found_in_childs.push(ltl);
-        }
-
-        return found_in_childs;
+        else if (ltl.opc == Formula.Operator.U && !this.#definitions.some((elem) => ltl.equals(elem[0])))
+            this.#definitions.push([ltl, this.#definitions.length + 1]);
     }
 
     #parse_subltls(ltl=null)
@@ -587,8 +579,7 @@ export class Solver
         for (i = 0; i < this.transformation_steps.length; i++)
             console.log(`Step ${i + 1}: ${this.transformation_steps[i].string}`);
 
-        for (let announced = this.#update_definitions(); announced.length != 0; announced = this.#update_definitions())
-            console.log(`Step ${++i}: ${this.ltl.def_string(this.#definitions)}`);
+        this.#collect_definitions();
 
         this.#parse_subltls();
         console.log(`Found ${this.all_subltls.length} unique subltls: ${this.all_subltls.map((subltl) => subltl.def_string(this.#definitions)).join("; ")}`);

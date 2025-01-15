@@ -29,8 +29,8 @@
     <main>
         <div class="form-container">
             <input type="text" id="textInput" placeholder="Введите LTL...">
-            <label for="compactTable"><input type="checkbox" id="compactTable" name="compactTable" checked />Компактный вид таблицы</label>
-            <label for="inversedMask"><input type="checkbox" id="inversedMask" name="inversedMask" />Инвертировать порядок перебора</label>
+            <label for="compactTable" class="table-settings"><input type="checkbox" id="compactTable" name="compactTable" checked />Компактный вид таблицы</label>
+            <label for="inversedMask" class="table-settings"><input type="checkbox" id="inversedMask" name="inversedMask" />Инвертировать порядок перебора</label>
             <button onclick="run_solver()">Решить</button>
         </div>
         <div id="output" class="output">
@@ -155,7 +155,7 @@
             const compactFlag = document.getElementById("compactTable");
             const inversedFlag = document.getElementById("inversedMask");
             const outputDiv = document.getElementById("output");
-            
+
             let solver = new LTL2Buchi.Solver(inversedFlag.checked);
             solver.solve(inputField.value);
 
