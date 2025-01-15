@@ -71,9 +71,11 @@
             table.classList.add("generated-output");
 
             let header = document.createElement("thead");
-            let tr = document.createElement("tr");
-
+            let body = document.createElement("tbody");
             table.appendChild(header);
+            table.appendChild(body);
+
+            let tr = document.createElement("tr");
             header.appendChild(tr);
             
             for (let i = 0; i < solver.variables_count; i++)
@@ -89,6 +91,31 @@
                 let cell = document.createElement("th");
                 cell.classList.add("tg-0pky");
                 tr.appendChild(cell);
+            }
+
+            let states_table = solver.raw_states_table();
+
+            for (let line = 0; line < states_table.length; line++)
+            {
+                tr = document.createElement("tr");
+                body.appendChild(tr);
+
+                for (let column = 0; column < states_table[line].length; column++)
+                {
+                    if (column == 0 && states_table[line][column] != null)
+                    {
+                        // add atoms truth
+                    }
+
+                    if (states_table[line][column] != null)
+                    {
+                        let td = document.createElement("td");
+                        td.appendChild(document.createTextNode(solver.truth_list_for_mask(states_table[line][column].data).map((ltl) => `\$${ltl.def_latex(solver.definitions)}\$`).join(", ")));
+                        td.classList.add("tg-0pky");
+                        td.setAttribute("rowspan", states_table[line][column].leafs_count);
+                        tr.appendChild(td);
+                    }
+                }
             }
 
             return table;

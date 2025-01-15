@@ -39,6 +39,11 @@ export class Solver
 
     #states_trees = [];
 
+    get states_trees()
+    {
+        return this.#states_trees;
+    }
+
     get states_count()
     {
         let sum = 0;
@@ -69,11 +74,83 @@ export class Solver
         return states;
     }
 
+    raw_state_path(idx)
+    {
+        let internal_idx = idx;
+        let tree_idx = 0;
+
+        while (internal_idx >= this.states_trees[tree_idx].leafs_count)
+        {
+            internal_idx -= this.states_trees[tree_idx].leafs_count;
+            tree_idx++;
+        }
+
+        let cur_tree_node = this.states_trees[tree_idx];
+
+        let path = [cur_tree_node];
+
+        while (cur_tree_node.false_branch != null && cur_tree_node.true_branch != null)
+        {
+            if (internal_idx < cur_tree_node.false_branch.leafs_count)
+                cur_tree_node = cur_tree_node.false_branch;
+
+            else
+            {
+                internal_idx -= cur_tree_node.false_branch.leafs_count;
+                cur_tree_node = cur_tree_node.true_branch;
+            }
+
+            path.push(cur_tree_node);
+        }
+
+        return path;
+    }
+
+    raw_states_table()
+    {
+        let min = (a, b) => (a > b) ? a : b;
+
+        let table = [];
+        for (let i = 0; i < this.states_count; i++)
+            table.push(this.raw_state_path(i));
+        
+        for (let i = table.length - 1; i > 0; i--)
+        {
+            for (let j = 0; j < min(table[i].length, table[i - 1].length); j++)
+            {
+                if (table[i][j] == table[i - 1][j])
+                    table[i][j] = null;
+                else
+                    break;
+            }
+        }
+
+        return table;
+    }
+
     #definitions = [];
+
+    get definitions()
+    {
+        return this.#definitions;
+    }
 
     constructor()
     {
         
+    }
+
+    truth_list_for_mask(mask)
+    {
+        let truth_list = [];
+
+        for (let i = 0; i < mask.length; i++)
+        {
+            if (mask[i] == true)
+                truth_list.push(this.all_subltls[i]);
+        }
+
+        return truth_list;
     }
 
     #propagate_X(ltl, branch_X_count = 0)
@@ -528,8 +605,10 @@ export class Solver
 }
 
 // let solver = new Solver();
-// // solver.solve("Fa U Gb & c -> d");
-// // solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
-// // solver.solve("(p -> Xq) U (!p & q)");
-// // solver.solve("G(q -> (!p & X(!q U p)))");
+// solver.solve("Fa U Gb & c -> d");
+// solver.solve("x U (XFy & Fp) -> X(Gr | X(t & Xi & false) | s) & (o & p)");
+// solver.solve("(p -> Xq) U (!p & q)");
+// solver.solve("G(q -> (!p & X(!q U p)))");
+// solver.solve("p U t");
 // solver.solve("Fp U Fq");
+// console.log(solver.raw_states_table());
