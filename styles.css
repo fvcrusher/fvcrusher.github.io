@@ -81,11 +81,13 @@ button:hover {
     font-size: 1em;
     color: #333;
     display: none;
+    text-align: left;
 }
 
 /* Output Section */
 .latex-string {
     line-height: 2.5;
+    text-align: center;
 }
 
 .warning {
@@ -95,6 +97,7 @@ button:hover {
     border-style: solid;
     border-radius: 8px;
     padding: 5px;
+    text-align: center;
 }
 
 /* Footer */
@@ -115,6 +118,8 @@ footer p {
 .tg {
     border-collapse: collapse;
     border-spacing: 0;
+    display: block;
+    overflow-x: auto;
 }
 
 .tg td {

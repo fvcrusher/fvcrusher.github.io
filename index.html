@@ -46,11 +46,13 @@
         <p>2025</p>
     </footer>
     <script>
-        function add_paragraph(container, text, latex=false) {
+        function add_paragraph(container, text, latex=false, warning=false) {
             let par = document.createElement("p");
             par.classList.add("generated-output");
             if (latex)
                 par.classList.add("latex-string");
+            if (warning)
+                par.classList.add("warning");
             if (typeof text === "string")
             {
                 let txt = document.createTextNode(text);
@@ -131,15 +133,15 @@
                             }
                         }
 
-                        let truth_list_str = (truth_list.length == 0) ? "$\\emptyset$" : truth_list.map((ltl) => `\$${ltl.def_latex(solver.definitions)}\$`).join(", ");
+                        let truth_list_str = (truth_list.length == 0) ? "\\emptyset" : truth_list.map((ltl) => `${ltl.def_latex(solver.definitions)}`).join(", ");
 
                         if (compact && column > 0)
-                            truth_list_str = "\$+\$ " + truth_list_str;
+                            truth_list_str = "+ " + truth_list_str;
 
                         if (column == states_table[line].length - 1)
-                            truth_list_str = `\$\\mathbf{s_{${line + 1}}}\$: ` + truth_list_str;
+                            truth_list_str = `\\mathbf{s_{${line + 1}}}: ` + truth_list_str;
 
-                        td.appendChild(document.createTextNode(truth_list_str));
+                        td.appendChild(document.createTextNode(`\$${truth_list_str}\$`));
                         td.classList.add("tg-0pky");
                         td.setAttribute("rowspan", states_table[line][column].leafs_count);
                         tr.appendChild(td);
@@ -165,9 +167,13 @@
             add_paragraph(outputDiv, `\$ \\varphi \$ \$ = \$ ${solver.transformation_steps.map((step) => `\$${step.latex}\$`).join(" \$ = \$ ")}`, true);
             add_paragraph(outputDiv, `В полученной формуле необходимо выделить независимые подформулы (переменные и операции $\\mathbf{X}$). Таких подформул ${solver.variables_count}: ${solver.variables.map((variable) => `\$${variable.latex}\$`).join(", ")}. Составим таблицу истинности с расщеплениями.`);
             
-            add_paragraph(outputDiv, generate_table(solver, compactFlag.checked));
+            let table = generate_table(solver, compactFlag.checked);
+            add_paragraph(outputDiv, table);
 
             outputDiv.style.display = "block";
+
+            // if (table.scrollWidth > (outputDiv.clientWidth - 30))
+            //     add_paragraph(outputDiv, "Таблица оказалось слишком широкой, не забудьте про горизонтальную прокрутку!", false, true);
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
         }
