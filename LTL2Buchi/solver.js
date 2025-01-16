@@ -151,6 +151,13 @@ export class Solver
         return this.#acceptable_states;
     }
 
+    #edges = [];
+
+    get edges()
+    {
+        return this.#edges;
+    }
+
     get untils_list()
     {
         let found = [];
@@ -176,6 +183,19 @@ export class Solver
         for (let i = 0; i < mask.length; i++)
         {
             if (mask[i] == true)
+                truth_list.push(this.all_subltls[i]);
+        }
+
+        return truth_list;
+    }
+
+    atoms_truth_list_for_mask(mask)
+    {
+        let truth_list = [];
+
+        for (let i = 0; i < mask.length; i++)
+        {
+            if (mask[i] == true && (this.all_subltls[i].opc == Formula.Operator.ATOM || this.all_subltls[i].opc == Formula.Operator.X))
                 truth_list.push(this.all_subltls[i]);
         }
 
@@ -640,6 +660,78 @@ export class Solver
         }
     }
 
+    edge_resrictions(from)
+    {
+        let state = this.states[from]
+
+        let restrictions = [];
+
+        for (let i = 0; i < state.length; i++)
+        {
+            switch(this.all_subltls[i].opc)
+            {
+                case Formula.Operator.X:
+                    restrictions.push(`${this.all_subltls[i].lop.def_latex(this.definitions)} ${state[i] ? "\\in" : "\\notin"} s'`);
+                    break;
+
+                case Formula.Operator.U:
+                    let lhs_idx = this.all_subltls.findIndex((subltl) => subltl.equals(this.all_subltls[i].lop))
+                    let rhs_idx = this.all_subltls.findIndex((subltl) => subltl.equals(this.all_subltls[i].rop))
+                    if (state[lhs_idx] == true && state[rhs_idx] == false)
+                        restrictions.push(`${this.all_subltls[i].def_latex(this.definitions)} ${state[i] ? "\\in" : "\\notin"} s'`);
+                    break;
+            }
+        }
+
+        return restrictions.join("\\hspace{0.1cm}\\mathbf{\\wedge}\\hspace{0.1cm}");
+    }
+
+    #check_edge_rules(from, to)
+    {
+        for (let i = 0; i < this.all_subltls.length; i++)
+        {
+            switch (this.all_subltls[i].opc)
+            {
+                case Formula.Operator.X:
+                    let x_var_idx = this.all_subltls.findIndex((elem) => elem.equals(this.all_subltls[i].lop));
+                    if (this.states[from][i] != this.states[to][x_var_idx])
+                        return false;
+                    break;
+
+                case Formula.Operator.U:
+                    let u_lhs_idx = this.all_subltls.findIndex((elem) => elem.equals(this.all_subltls[i].lop));
+                    let u_rhs_idx = this.all_subltls.findIndex((elem) => elem.equals(this.all_subltls[i].rop));
+                    if (!(
+                        (this.states[from][i] == true && this.states[from][u_rhs_idx] == true) ||
+                        (this.states[from][i] == false && this.states[from][u_lhs_idx] == false && this.states[from][u_rhs_idx] == false) ||
+                        (this.states[from][u_lhs_idx] == true && this.states[from][u_rhs_idx] == false && this.states[from][i] == this.states[to][i])
+                    ))
+                        return false;
+                    break;
+            }
+        }
+
+        return true;
+    }
+
+    #build_edges()
+    {
+        this.#edges = [];
+
+        for (let state_no = 0; state_no < this.states_count; state_no++)
+        {
+            let edg = [];
+
+            for (let target_no = 0; target_no < this.states_count; target_no++)
+            {
+                if (this.#check_edge_rules(state_no, target_no))
+                    edg.push(target_no);
+            }
+
+            this.#edges.push(edg);
+        }
+    }
+
     solve(ltl)
     {
         if (typeof ltl === "string")
@@ -671,6 +763,7 @@ export class Solver
 
         this.#build_initial_states();
         this.#build_acceptable_states();
+        this.#build_edges();
     }
 }
 

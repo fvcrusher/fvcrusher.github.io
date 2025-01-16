@@ -180,7 +180,20 @@
             {
                 let definition = `\$F_{${untils_list[i].def_latex(solver.definitions)}}\$`;
                 let declaration = `\$\\{ s : ${untils_list[i].rop.def_latex(solver.definitions)} \\in s \\hspace{0.1cm}\\mathbf{\\vee}\\hspace{0.1cm} ${untils_list[i].def_latex(solver.definitions)} \\notin s \\}\$`;
-                let value = `\$\\{\$ ${solver.acceptable_states[i].map((state_no) => `\$s_{${state_no + 1}}`).join(",$ ")}\$ \$\\}\$`;
+                let value = `\$ \\{\$ ${solver.acceptable_states[i].map((state_no) => `\$s_{${state_no + 1}}`).join(",$ ")}\$ \$\\} \$`;
+                add_paragraph(outputDiv, `${definition} \$=\$ ${declaration} \$=\$ ${value}`, true);
+            }
+
+            add_paragraph(outputDiv, "Распишем переходы для всех состояний.");
+
+            for (let i = 0; i < solver.states_count; i++)
+            {
+                let atoms_truth = solver.atoms_truth_list_for_mask(solver.states[i]);
+                let atoms_truth_str = (atoms_truth.length == 0) ? "\\emptyset" : `\\{ ${atoms_truth.map((atom) => atom.def_latex(solver.definition)).join(",")} \\}`
+                let definition = `\$ \\delta(s_{${i + 1}}, ${atoms_truth_str}) \$`;
+                let declaration = `\$ \\{ s' : ${solver.edge_resrictions(i)} \\} \$`;
+                let edges = solver.edges[i];
+                let value = (edges.length == 0) ? "\$\\emptyset\$" : `\$ \\{\$ ${solver.edges[i].map((state_no) => `\$s_{${state_no + 1}}`).join(",$ ")}\$ \$\\} \$`;
                 add_paragraph(outputDiv, `${definition} \$=\$ ${declaration} \$=\$ ${value}`, true);
             }
 
