@@ -137,6 +137,13 @@ export class Solver
 
     #inversed_mask = false;
 
+    #initial_states = [];
+
+    get initial_states()
+    {
+        return this.#initial_states;
+    }
+
     constructor(inversed_mask=false)
     {
         this.#inversed_mask = inversed_mask;
@@ -559,9 +566,20 @@ export class Solver
 
     #is_initial_state(state_no)
     {
-        let state = this.states[state_no - 1];
+        let state = this.states[state_no];
 
         return state[state.length - 1];
+    }
+
+    #build_initial_states()
+    {
+        this.#initial_states = [];
+
+        for (let state_no = 0; state_no < this.states_count; state_no++)
+        {
+            if (this.#is_initial_state(state_no))
+                this.#initial_states.push(state_no);
+        }
     }
 
     solve(ltl)
@@ -593,7 +611,7 @@ export class Solver
 
         console.log(`Found ${this.states_count} states, max split depth is ${this.states_trees_depth}`);
 
-
+        this.#build_initial_states();
     }
 }
 
