@@ -186,12 +186,22 @@
 
             add_paragraph(outputDiv, "Распишем переходы для всех состояний.");
 
+            let known_declarations = {};
+
             for (let i = 0; i < solver.states_count; i++)
             {
                 let atoms_truth = solver.atoms_truth_list_for_mask(solver.states[i]);
                 let atoms_truth_str = (atoms_truth.length == 0) ? "\\emptyset" : `\\{ ${atoms_truth.map((atom) => atom.def_latex(solver.definition)).join(",")} \\}`
                 let definition = `\$ \\delta(s_{${i + 1}}, ${atoms_truth_str}) \$`;
-                let declaration = `\$ \\{ s' : ${solver.edge_resrictions(i)} \\} \$`;
+                let restrictions = solver.edge_resrictions(i);
+                let declaration = null;
+                if (known_declarations.hasOwnProperty(restrictions))
+                    declaration = known_declarations[restrictions];
+                else
+                {
+                    declaration = `\$ \\{ s' : ${restrictions} \\} \$`;
+                    known_declarations[restrictions] = definition;
+                }
                 let edges = solver.edges[i];
                 let value = (edges.length == 0) ? "\$\\emptyset\$" : `\$ \\{\$ ${solver.edges[i].map((state_no) => `\$s_{${state_no + 1}}`).join(",$ ")}\$ \$\\} \$`;
                 add_paragraph(outputDiv, `${definition} \$=\$ ${declaration} \$=\$ ${value}`, true);
