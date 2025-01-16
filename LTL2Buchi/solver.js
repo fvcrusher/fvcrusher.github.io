@@ -144,6 +144,26 @@ export class Solver
         return this.#initial_states;
     }
 
+    #acceptable_states = [];
+
+    get acceptable_states()
+    {
+        return this.#acceptable_states;
+    }
+
+    get untils_list()
+    {
+        let found = [];
+
+        for (let i = 0; i < this.all_subltls.length; i++)
+        {
+            if (this.all_subltls[i].opc == Formula.Operator.U)
+                found.push(this.all_subltls[i]);
+        }
+
+        return found;
+    }
+
     constructor(inversed_mask=false)
     {
         this.#inversed_mask = inversed_mask;
@@ -582,6 +602,44 @@ export class Solver
         }
     }
 
+    #is_acceptable_state(state_no, until)
+    {
+        let state = this.states[state_no];
+
+        for (let until_idx = 0; until_idx < this.all_subltls.length; until_idx++)
+        {
+            if (this.all_subltls[until_idx].equals(until))
+            {
+                for (let until_rhs_idx = 0; until_rhs_idx < this.all_subltls.length; until_rhs_idx++)
+                {
+                    if (this.all_subltls[until_rhs_idx].equals(until.rop))
+                    {
+                        if (state[until_idx] == state[until_rhs_idx])
+                            return true;
+                        else
+                            return false;
+                    }
+                }
+            }
+        }
+    }
+
+    #build_acceptable_states()
+    {
+        this.#acceptable_states = [];
+
+        for (let until_no = 0; until_no < this.untils_list.length; until_no++)
+        {
+            let acc = [];
+            for (let state_no = 0; state_no < this.states_count; state_no++)
+            {
+                if (this.#is_acceptable_state(state_no, this.untils_list[until_no]))
+                    acc.push(state_no);
+            }
+            this.#acceptable_states.push(acc);
+        }
+    }
+
     solve(ltl)
     {
         if (typeof ltl === "string")
@@ -612,6 +670,7 @@ export class Solver
         console.log(`Found ${this.states_count} states, max split depth is ${this.states_trees_depth}`);
 
         this.#build_initial_states();
+        this.#build_acceptable_states();
     }
 }
 

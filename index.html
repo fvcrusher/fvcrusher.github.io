@@ -171,7 +171,18 @@
             add_paragraph(outputDiv, table);
 
             add_paragraph(outputDiv, "Запишем начальные состояния - состояния, в которых истина сама формула:");
-            add_paragraph(outputDiv, `\$I\$ \$=\$ \$\\{s : \\varphi \\in s\\}\$ \$=\$ \$\\{\$ ${solver.initial_states.map((state_no) => `\$s_{${state_no + 1}}\$`).join(" $,$ ")} \$\\}\$`);
+            add_paragraph(outputDiv, `\$I\$ \$=\$ \$\\{s : \\varphi \\in s\\}\$ \$=\$ \$\\{\$ ${solver.initial_states.map((state_no) => `\$s_{${state_no + 1}}`).join(",$ ")}\$ \$\\}\$`, true);
+
+            let untils_list = solver.untils_list;
+            add_paragraph(outputDiv, `Количество множеств допускающих состояний равно количеству операций $\\mathbf{U}$ в преобразованной формуле. Таким образом множеств будет ${untils_list.length}. Запишем их.`)
+
+            for (let i = 0; i < untils_list.length; i++)
+            {
+                let definition = `\$F_{${untils_list[i].def_latex(solver.definitions)}}\$`;
+                let declaration = `\$\\{ s : ${untils_list[i].rop.def_latex(solver.definitions)} \\in s \\hspace{0.1cm}\\mathbf{\\vee}\\hspace{0.1cm} ${untils_list[i].def_latex(solver.definitions)} \\notin s \\}\$`;
+                let value = `\$\\{\$ ${solver.acceptable_states[i].map((state_no) => `\$s_{${state_no + 1}}`).join(",$ ")}\$ \$\\}\$`;
+                add_paragraph(outputDiv, `${definition} \$=\$ ${declaration} \$=\$ ${value}`, true);
+            }
 
             outputDiv.style.display = "block";
 
