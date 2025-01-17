@@ -8,7 +8,16 @@
 </head>
 <body>
     <header>
-        <h1>FVCrusher</h1>
+        <div class="title button-group">
+            <button onclick="location.href='/'">FVCrusher</button>
+        </div>
+        <div class="button-group">
+            <button onclick="location.href='/cnf'" style="display: none;">КНФ</button>
+            <button onclick="location.href='/nelson_oppen'" style="display: none;">Нельсон-Оппен</button>
+            <button onclick="location.href='/ltl2buchi'">LTL → Бюхи</button>
+            <button onclick="location.href='/robdd'" style="display: none;">ROBDD</button>
+            <button onclick="location.href='/knowledgebase'" style="display: none;">База знаний</button>
+        </div>
     </header>
     <main>
         <div class="contents">
@@ -62,10 +71,10 @@
                 их вашему вниманию:
             </p>
             <ul>
-                <li>Построение КНФ по кодировке Цейтина</li>
-                <li>Разрешающая процедура Нельсона-Оппена</li>
+                <li style="display: none;">Построение КНФ по кодировке Цейтина</li>
+                <li style="display: none;">Разрешающая процедура Нельсона-Оппена</li>
                 <li><a href="ltl2buchi.html">Преобразование LTL → Автомат Бюхи</a></li>
-                <li>Построение ROBDD</li>
+                <li style="display: none;">Построение ROBDD</li>
             </ul>
             <h2>
                 База знаний
@@ -75,10 +84,10 @@
                 связанные с курсом.
             </p>
             <ul>
-                <li>Варианты контрольных работ прошлых лет с решениями</li>
-                <li>Варианты решенных задач по frama-c</li>
-                <li>Варианты решенных задач по spin</li>
-                <li>Репозитории с решениями дополнительных практикумов</li>
+                <li style="display: none;">Варианты контрольных работ прошлых лет с решениями</li>
+                <li style="display: none;">Варианты решенных задач по frama-c</li>
+                <li style="display: none;">Варианты решенных задач по spin</li>
+                <li style="display: none;">Репозитории с решениями дополнительных практикумов</li>
             </ul>
         </div>
     </main>
