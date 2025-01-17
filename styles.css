@@ -20,9 +20,14 @@ header {
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 1;
+}
+
+.header-container {
+    max-width: 60em;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
+    margin: auto;
 }
 
 .title {
@@ -153,8 +158,13 @@ footer {
     padding: 5px 0;
     margin-top: auto;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer-container {
+    max-width: 60em;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    margin: auto;
 }
 
 footer p {
