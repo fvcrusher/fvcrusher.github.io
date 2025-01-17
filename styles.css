@@ -10,6 +10,15 @@ body {
     min-height: 100vh;
 }
 
+button {
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    font-size: 1em;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
 /* Header */
 header {
     position: sticky;
@@ -28,29 +37,6 @@ header {
     justify-content: space-between;
     align-items: center;
     margin: auto;
-}
-
-.title {
-    font-size: 1.5em;
-}
-
-.button-group {
-    display: flex;
-    gap: 10px;
-}
-
-.button-group button {
-    padding: 10px 15px;
-    background-color: transparent;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: auto;
-}
-
-.button-group button:hover {
-    background-color: #4e4e4e;
 }
 
 /* Main Content */
@@ -87,23 +73,61 @@ input[type="text"] {
     box-sizing: border-box;
 }
 
-button {
-    width: 100%;
+.solve-button {
     padding: 12px;
-    border: none;
     background-color: #4a4a4a;
     color: white;
-    font-size: 1em;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-button:hover {
+.solve-button:hover {
     background-color: #636363;
 }
 
-/* Output Section */
+.solve-button:active {
+    background-color: #888888;
+    transition: none;
+}
+
+.header-button {
+    padding: 12px;
+    background-color: transparent;
+    color: white;
+}
+
+.header-button:hover {
+    background-color: #636363;
+}
+
+.header-button:active {
+    background-color: #888888;
+    transition: none;
+}
+
+.home-button {
+    background-color: transparent;
+    color: white;
+    font-size: 1.5em;
+}
+
+.home-button:hover {
+    text-decoration: underline;
+}
+
+.nav-button {
+    padding: 12px;
+    background-color: transparent;
+    color: white;
+}
+
+.nav-button:hover {
+    background-color: #636363;
+}
+
+.nav-button:active {
+    background-color: #888888;
+    transition: none;
+}
+
 .output {
     margin-top: 20px;
     margin: auto;
@@ -132,7 +156,6 @@ button:hover {
     text-align: left;
 }
 
-/* Output Section */
 .latex-string {
     line-height: 2.5;
     text-align: center;
@@ -148,7 +171,6 @@ button:hover {
     text-align: center;
 }
 
-/* Footer */
 footer {
     position: sticky;
     bottom: 0;
@@ -158,13 +180,6 @@ footer {
     padding: 5px 0;
     margin-top: auto;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.footer-container {
-    max-width: 60em;
-    display: flex;
-    justify-content: space-between;
-    margin: auto;
 }
 
 footer p {
@@ -232,22 +247,81 @@ ul {
     margin-top: 3px;
 }
 
-.telegram-button {
+.footer-link {
     background-color: transparent;
-    margin: 0px;
+    margin: 0px 10px;
     padding: 0px;
     color: #aaa;
-    transition: color 0.3s;
 }
 
-.telegram-button:hover {
-    background-color: transparent;
-    margin: 0px;
-    padding: 0px;
+.footer-link:hover {
     color: white;
     transition: color 0.3s;
 }
 
+@media (min-width: 601px) 
+{
+    .footer-link-text {
+        display: inline;
+    }
+
+    .footer-container {
+        padding: 0px 20px;
+        max-width: 60em;
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+    }
+
+    .nav-panel {
+        margin: auto;
+        max-width: 60em;
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+        transition: all 0.3s;
+    }
+}
+
+@media (max-width: 600px) 
+{
+    .footer-link-text {
+        display: none;
+    }
+
+    .footer-container {
+        padding: 0px 20px;
+        max-width: 60em;
+        display: flex;
+        justify-content: center;
+        margin: auto;
+    }
+
+    .nav-panel {
+        margin: auto;
+        max-width: 60em;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+        transition: all 0.3s;
+    }
+}
+
 .bi {
     vertical-align: -.125em;
+}
+
+.inactive {
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+}
+
+.inactive:hover {
+    background-color: transparent;
 }
