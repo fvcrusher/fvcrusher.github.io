@@ -247,3 +247,7 @@ ul {
     color: white;
     transition: color 0.3s;
 }
+
+.bi {
+    vertical-align: -.125em;
+}
