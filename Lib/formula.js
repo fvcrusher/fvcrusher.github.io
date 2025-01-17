@@ -174,10 +174,14 @@ class Formula
         )
     }
 
-    #to_string_internal(wrap=false, latex=false, definitions=[])
+    #to_string_internal(wrap=false, latex=false, definitions=[], announce=[])
     {
+        let str = "";
+
         let wrap_lop = (this.lop != null && Formula.#need_wrapping(this.opc, this.lop.opc)) ? false : true;
         let wrap_rop = (this.rop != null && Formula.#need_wrapping(this.opc, this.rop.opc)) ? false : true;
+
+        let announce_definition = -1;
 
         for (let i = 0; i < definitions.length; i++)
         {
@@ -185,20 +189,35 @@ class Formula
                 return Formula.#definition_text(definitions[i][1]);
         }
 
+        for (let i = 0; i < announce.length; i++)
+        {
+            if (this.equals(announce[i][0]))
+            {
+                announce_definition = announce[i][1];
+                break;
+            }
+        }
+
+        if (latex && announce_definition != -1)
+            str += "\\overbrace{"
+
         switch (this.opc)
         {
             case Formula.Operator.TRUE:
             case Formula.Operator.FALSE:
-                return `${Formula.text_of(this.opc, latex)}`;
+                str += `${Formula.text_of(this.opc, latex)}`;
+                break;
             
             case Formula.Operator.ATOM:
-                return this.name;
+                str += this.name;
+                break;
 
             case Formula.Operator.NOT:
             case Formula.Operator.X:
             case Formula.Operator.F:
             case Formula.Operator.G:
-                return `${Formula.text_of(this.opc, latex)}${this.lop.#to_string_internal(wrap_lop, latex, definitions)}`;
+                str += `${Formula.text_of(this.opc, latex)}${this.lop.#to_string_internal(wrap_lop, latex, definitions, announce)}`;
+                break;
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
@@ -206,12 +225,18 @@ class Formula
             case Formula.Operator.U:
             case Formula.Operator.W:
             case Formula.Operator.R:
-                let res = `${this.lop.#to_string_internal(wrap_lop, latex, definitions)} ${Formula.text_of(this.opc, latex)} ${this.rop.#to_string_internal(wrap_rop, latex, definitions)}`;
-                return wrap ? `(${res})` : res;
+                let res = `${this.lop.#to_string_internal(wrap_lop, latex, definitions, announce)} ${Formula.text_of(this.opc, latex)} ${this.rop.#to_string_internal(wrap_rop, latex, definitions, announce)}`;
+                str += (wrap ? `(${res})` : res);
+                break;
 
             default:
                 throw new Error(`Unexpected operator kind: opc=${this.opc}`);
         }
+
+        if (latex && announce_definition != -1)
+            str += `}^{${Formula.#definition_text(announce_definition)}}`
+
+        return str;
     }
 
     get string()
@@ -219,9 +244,9 @@ class Formula
         return this.#to_string_internal(false, false);
     }
 
-    def_string(definitions)
+    def_string(definitions, announce=[])
     {
-        return this.#to_string_internal(false, false, definitions);
+        return this.#to_string_internal(false, false, definitions, announce);
     }
 
     get latex()
@@ -229,9 +254,9 @@ class Formula
         return this.#to_string_internal(false, true);
     }
 
-    def_latex(definitions)
+    def_latex(definitions, announce=[])
     {
-        return this.#to_string_internal(false, true, definitions);
+        return this.#to_string_internal(false, true, definitions, announce);
     }
 }
 

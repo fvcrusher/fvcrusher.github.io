@@ -424,6 +424,52 @@ export class Solver
             this.#definitions.push([ltl, this.#definitions.length + 1]);
     }
 
+    get_disjoint_definitions(known_definitions, ltl=null)
+    {
+        let definitions = []
+
+        let initial_ltl = (ltl == null);
+        if (ltl == null)
+            ltl = this.ltl;
+
+        if (ltl.lop)
+        {
+            let left_definitions = this.get_disjoint_definitions(known_definitions, ltl.lop);
+            for (let i = 0; i < left_definitions.length; i++)
+            {
+                if (definitions.findIndex((elem) => elem[0].equals(left_definitions[i])) == -1)
+                    definitions.push(left_definitions[i]);
+            }
+        }
+
+        if (ltl.rop)
+        {
+            let right_definitions = this.get_disjoint_definitions(known_definitions, ltl.rop);
+            for (let i = 0; i < right_definitions.length; i++)
+            {
+                if (definitions.findIndex((elem) => elem[0].equals(right_definitions[i])) == -1)
+                    definitions.push(right_definitions[i]);
+            }
+        }
+
+        if (definitions.length == 0 && (ltl.opc == Formula.Operator.U || initial_ltl))
+        {
+            for (let i = 0; i < known_definitions.length; i++)
+            {
+                if (known_definitions[i][0].equals(ltl))
+                    return definitions;
+            }
+
+            for (let i = 0; i < this.#definitions.length; i++)
+            {
+                if (this.#definitions[i][0].equals(ltl))
+                    return definitions.concat([this.#definitions[i]]);
+            }
+        }
+
+        return definitions;
+    }
+
     #parse_subltls(ltl=null)
     {
         if (ltl == null)
