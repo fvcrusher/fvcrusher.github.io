@@ -84,6 +84,20 @@ button:hover {
     text-align: left;
 }
 
+.contents {
+    margin-top: 20px;
+    margin: auto;
+    max-width: 60em;
+    padding: 15px;
+    background-color: #ededed;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    color: #333;
+    display: block;
+    text-align: left;
+}
+
 /* Output Section */
 .latex-string {
     line-height: 2.5;
