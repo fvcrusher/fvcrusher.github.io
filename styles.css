@@ -21,7 +21,7 @@ header {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 1;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
 }
 
@@ -153,6 +153,8 @@ footer {
     padding: 5px 0;
     margin-top: auto;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-evenly;
 }
 
 footer p {
@@ -218,4 +220,20 @@ li {
 
 ul {
     margin-top: 3px;
+}
+
+.telegram-button {
+    background-color: transparent;
+    margin: 0px;
+    padding: 0px;
+    color: #aaa;
+    transition: color 0.3s;
+}
+
+.telegram-button:hover {
+    background-color: transparent;
+    margin: 0px;
+    padding: 0px;
+    color: white;
+    transition: color 0.3s;
 }
