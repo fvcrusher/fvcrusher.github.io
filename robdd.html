@@ -5,8 +5,24 @@
     <link type="Image/x-icon" href="favicon.ico" rel="icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FVCrusher</title>
+    <title>FVCrusher · ROBDD</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        let LTL2Buchi = null;
+        import("./LTL2Buchi/solver.js").then((mod) => LTL2Buchi = mod);
+    </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            jax: ["input/TeX", "output/HTML-CSS"],
+            extensions: ["tex2jax.js"],
+            "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] },
+            tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+            TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
+            messageStyle: "none"
+        });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
 </head>
 <body>
     <header>
@@ -47,69 +63,17 @@
         </div>
     </header>
     <main>
-        <div class="contents">
-            <p>
-                Миссия данного сайта - облегчить страдания студентов МФТИ и 
-                ВШЭ при прохождении курса "Формальная верификация" в ИСП РАН.
+        <div class="form-container">
+            <input type="text" id="textInput" placeholder="Введите логическое выражение...">
+            <button class="solve-button" onclick="run_solver()">Решить</button>
+        </div>
+        <div id="output" class="output">
+            <p class="warning">
+                <span>&#9888;</span> Данное решение не является истиной в 
+                последней инстанции, настоятельно рекомендуется при использовании 
+                проверять корректность. В случае обнаружения ошибок в решении 
+                рекомендуется завести issue в репозитории проекта
             </p>
-            <h2>
-                Состав курса
-            </h2>
-            <ul>
-                <li>
-                    <b>Практикум по frama-c</b>
-                </li>
-                <li>
-                    <b>Практикум по spin</b>
-                </li>
-                <li>
-                    <b>Контрольная работа 1</b>
-                    <ul>
-                        <li>Метод Флойда</li>
-                        <li>Построение КНФ по кодировке Цейтина</li>
-                        <li>Разрешающая процедура Нельсона-Оппена</li>
-                    </ul>
-                </li>
-                <li>
-                    <b>Контрольная работа 2</b>
-                    <ul>
-                        <li>Построение LTL</li>
-                        <li><a href="ltl2buchi.html">Преобразование LTL → Автомат Бюхи</a></li>
-                        <li>Построение ROBDD</li>
-                    </ul>
-                </li>
-                <li><i>Дополнительный практикум по алгоритму DPLL</i></li>
-                <li><i>Дополнительный практикум по преобразованию LTL в автомат Бюхи</i></li>
-            </ul>
-            <p>
-                Для закрытия курса минимально необходимо сдать (читай получить 
-                любую оценку) два обязательных практикума и написать две 
-                контрольные работы. Без учета дополнительных заданий потолок 
-                оценки составит хор(6). Для повышения потолка надо сдавать доп. 
-                задания.
-            </p>
-            <h2>
-                Автоматические солверы
-            </h2>
-            <p>
-                Большинство задач на контрольных решаются алгоритмически, 
-                но требуют значительных затрат по времени и большой внимательности.
-                В связи с этим были написаны автоматические солверы. Они доступны 
-                в верхнем меню и в списке задач.
-            </p>
-            <h2>
-                База знаний
-            </h2>
-            <p>
-                Кроме того, здесь собраны все имеющиеся в наличии материалы, 
-                связанные с курсом.
-            </p>
-            <ul>
-                <li style="display: none;">Варианты контрольных работ прошлых лет с решениями</li>
-                <li style="display: none;">Варианты решенных задач по frama-c</li>
-                <li style="display: none;">Варианты решенных задач по spin</li>
-                <li style="display: none;">Репозитории с решениями дополнительных практикумов</li>
-            </ul>
         </div>
     </main>
     <footer>
@@ -133,5 +97,21 @@
             </div>
         </div>
     </footer>
+    <script>
+        function clear_output(container) {
+            let to_remove = container.getElementsByClassName("generated-output");
+            while (to_remove.length > 0)
+                container.removeChild(to_remove[0]);
+        }
+
+        function run_solver() {
+            const inputField = document.getElementById("textInput");
+            const outputDiv = document.getElementById("output");
+
+            clear_output(outputDiv);
+
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        }
+    </script>
 </body>
 </html>
