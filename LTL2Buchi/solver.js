@@ -1,6 +1,6 @@
 import Parser from "../Lib/parser.js";
 import Formula from "../Lib/formula.js";
-import TreeNode from "./tree.js";
+import TreeNode from "../Lib/tree.js";
 
 export class Solver
 {
