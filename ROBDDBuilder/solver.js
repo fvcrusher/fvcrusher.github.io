@@ -157,7 +157,7 @@ export class Solver
         }
 
         if (idx == variables_order.length) // Exiting, if there is no variables in formula
-            return
+            return;
 
         let current_variable = variables_order[idx];
 
@@ -183,8 +183,12 @@ export class Solver
         console.log(this.#initial_formula.string);
         console.log("Simplifiing");
         console.log(this.#simplify(this.#initial_formula).string);
+
+        let parser = new Parser();
+        this.#solver_step(this.#initial_formula, [parser.parse("x"), parser.parse("y"), parser.parse("z")]);
     }
 }
 
 let solver = new Solver()
-solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))");
+// solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))");
+solver.solve("(x & y) | (!x & z) + (x | (y + !z))");
