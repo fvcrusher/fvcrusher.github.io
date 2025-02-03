@@ -165,6 +165,21 @@ class Formula
         return node_equals && lop_equals && rop_equals;
     }
 
+    contains(other)
+    {
+        let contains = false;
+
+        contains |= this.equals(other);
+        
+        if (this.lop != null)
+            contains |= this.lop.contains(other);
+
+        if (this.rop != null)
+            contains |= this.rop.contains(other);
+
+        return contains;
+    }
+
     static #need_wrapping(opc, nested_opc)
     {
         return (
@@ -221,6 +236,7 @@ class Formula
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
+            case Formula.Operator.XOR:
             case Formula.Operator.IMPL:
             case Formula.Operator.U:
             case Formula.Operator.W:
