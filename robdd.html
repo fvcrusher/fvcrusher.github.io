@@ -8,8 +8,8 @@
     <title>FVCrusher · ROBDD</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        let LTL2Buchi = null;
-        import("./LTL2Buchi/solver.js").then((mod) => LTL2Buchi = mod);
+        let ROBDDBuilder = null;
+        import("./ROBDDBuilder/solver.js").then((mod) => ROBDDBuilder = mod);
     </script>
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
@@ -107,6 +107,9 @@
         function run_solver() {
             const inputField = document.getElementById("textInput");
             const outputDiv = document.getElementById("output");
+
+            let solver = new ROBDDBuilder.Solver();
+            solver.solve(inputField.value);
 
             clear_output(outputDiv);
 
