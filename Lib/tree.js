@@ -3,6 +3,13 @@ class TreeNode
     #data = null;
     false_branch = null;
     true_branch = null;
+    #id = 0;
+    static #counter = 0;
+
+    get id()
+    {
+        return this.#id;
+    }
 
     get data()
     {
@@ -11,6 +18,7 @@ class TreeNode
 
     constructor(data)
     {
+        this.#id = TreeNode.#counter++;
         this.#data = data;
     }
 
