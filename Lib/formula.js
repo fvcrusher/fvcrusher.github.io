@@ -274,6 +274,29 @@ class Formula
     {
         return this.#to_string_internal(false, true, definitions, announce);
     }
+
+    get variables()
+    {
+        let variables = [];
+
+        if (this.lop != null)
+            variables = this.lop.variables;
+
+        if (this.rop != null)
+        {
+            let rop_variables = this.rop.variables;
+            for (let i = 0; i < rop_variables.length; i++)
+            {
+                if (!variables.some((variable) => variable.equals(rop_variables[i])))
+                    variables.push(rop_variables[i]);
+            }
+        }
+
+        if (this.opc == Formula.Operator.ATOM && !variables.some((variable) => variable.equals(this)))
+            variables.push(Formula.copy(this))
+
+        return variables;
+    }
 }
 
 export default Formula;
