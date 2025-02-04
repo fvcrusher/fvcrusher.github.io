@@ -8,6 +8,7 @@ export class Solver
     #atoms_order = null;
     #known_branches = [];
     robdd = null;
+    #solution_steps = [];
 
     constructor()
     {}
@@ -149,7 +150,7 @@ export class Solver
         }
     }
 
-    #solver_step(formula, variable_idx=0)
+    #solver_step(formula, variable_idx=0, depth = 0)
     {
         for (let i = 0; i < this.#known_branches.length; i++)
         {
@@ -186,14 +187,14 @@ export class Solver
 
             if (true_branch_formula.equals(false_branch_formula))
             {
-                current_node = this.#solver_step(true_branch_formula, idx + 1);
+                current_node = this.#solver_step(true_branch_formula, idx + 1, depth + 1);
             }
 
             else
             {
                 current_node = new TreeNode(current_variable.string);
-                let true_branch_node = this.#solver_step(true_branch_formula, idx + 1);
-                let false_branch_node = this.#solver_step(false_branch_formula, idx + 1);
+                let true_branch_node = this.#solver_step(true_branch_formula, idx + 1, depth + 1);
+                let false_branch_node = this.#solver_step(false_branch_formula, idx + 1, depth + 1);
                 current_node.true_branch = true_branch_node;
                 current_node.false_branch = false_branch_node;
             }
@@ -254,29 +255,27 @@ export class Solver
 
     robdd_graph_dump(grouping = true, shuffle = false)
     {
-        let result = `digraph G {\nrankdir=TB;\ngraph[dpi = 300];\nordering=\"${shuffle ? "in" : "out"}\"\n`
+        let result = `digraph G { rankdir=TB; ordering=\"${shuffle ? "in" : "out"}\"\n`
 
         if (!grouping)
-            result += `${this.#recoursive_robdd_graph_dump_nodes(this.robdd).join("\n")}\n`;
+            result += `${this.#recursive_robdd_graph_dump_nodes(this.robdd).join("\n")}\n`;
 
         else
         {
             for (let i = 0; i < this.#atoms_order.length; i++)
-            {
-                console.log(this.#atoms_order[i].string);
-                result += `subgraph {\nrank=same\n${this.#recoursive_robdd_graph_dump_nodes(this.robdd, true, this.#atoms_order[i]).join("\n")}\n}\n`
-            }
-            result += `subgraph {\nrank=same\n${this.#recoursive_robdd_graph_dump_nodes(this.robdd, true).join("\n")}\n}\n`
+                result += `\tsubgraph { rank=same\n${this.#recursive_robdd_graph_dump_nodes(this.robdd, true, this.#atoms_order[i]).join("\n")}\n\t}\n`
+
+            result += `\tsubgraph { rank=same\n${this.#recursive_robdd_graph_dump_nodes(this.robdd, true).join("\n")}\n\t}\n`
         }
 
-        result += `${this.#recoursive_robdd_graph_dump_edges(this.robdd).join("\n")}\n`;
+        result += `${this.#recursive_robdd_graph_dump_edges(this.robdd).join("\n")}\n`;
 
         result += "}"
 
         return result
     }
 
-    #recoursive_robdd_graph_dump_nodes(node, grouping = false, atom_to_dump = null, visited_nodes=[])
+    #recursive_robdd_graph_dump_nodes(node, grouping = false, atom_to_dump = null, visited_nodes=[])
     {
         if (visited_nodes.indexOf(node) != -1)
             return [];
@@ -289,18 +288,18 @@ export class Solver
             (grouping && atom_to_dump != null && node.data == atom_to_dump.string) || 
             (grouping && atom_to_dump == null && (node.data == "1" || node.data == "0"))
         )
-            result.push(`id${node.id}[label="${node.data}", shape="${(node.data == "1" || node.data == "0") ? "box" : "circle"}"]`);
+            result.push(`${grouping ? "\t\t" : "\t"}id${node.id} [label="${node.data}", shape=${(node.data == "1" || node.data == "0") ? "box" : "circle"}]`);
 
         if (node.false_branch)
-            result = result.concat(this.#recoursive_robdd_graph_dump_nodes(node.false_branch, grouping, atom_to_dump, visited_nodes));
+            result = result.concat(this.#recursive_robdd_graph_dump_nodes(node.false_branch, grouping, atom_to_dump, visited_nodes));
     
         if (node.true_branch)
-            result = result.concat(this.#recoursive_robdd_graph_dump_nodes(node.true_branch, grouping, atom_to_dump, visited_nodes));
+            result = result.concat(this.#recursive_robdd_graph_dump_nodes(node.true_branch, grouping, atom_to_dump, visited_nodes));
 
         return result;
     }
 
-    #recoursive_robdd_graph_dump_edges(node, visited_nodes=[])
+    #recursive_robdd_graph_dump_edges(node, visited_nodes=[])
     {
         if (visited_nodes.indexOf(node) != -1)
             return [];
@@ -310,14 +309,14 @@ export class Solver
 
         if (node.false_branch)
         {
-            result.push(`id${node.id}->id${node.false_branch.id}[style=dashed]`);
-            result = result.concat(this.#recoursive_robdd_graph_dump_edges(node.false_branch, visited_nodes));
+            result.push(`\tid${node.id}->id${node.false_branch.id} [style=dashed]`);
+            result = result.concat(this.#recursive_robdd_graph_dump_edges(node.false_branch, visited_nodes));
         }
 
         if (node.true_branch)
         {
-            result.push(`id${node.id}->id${node.true_branch.id}`);
-            result = result.concat(this.#recoursive_robdd_graph_dump_edges(node.true_branch, visited_nodes));
+            result.push(`\tid${node.id}->id${node.true_branch.id}`);
+            result = result.concat(this.#recursive_robdd_graph_dump_edges(node.true_branch, visited_nodes));
         }
 
         return result;
@@ -327,7 +326,7 @@ export class Solver
 let solver = new Solver()
 let vars = Solver.get_atoms("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))");
 console.log(vars.map((v) => v.string));
-solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))"/*, ["x0", "x1", "x2", "y0", "y1", "y2"]*/);
+solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))", ["x0", "x1", "x2", "y0", "y1", "y2"]);
 // solver.solve("(x & y) | (!x & z) + (x | (y + !z))");
 console.log(solver.robdd_graph_dump(true, false));
 
