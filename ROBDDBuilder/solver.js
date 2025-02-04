@@ -203,20 +203,26 @@ export class Solver
         return current_node;
     }
 
-    solve(formula, atoms_order)
+    solve(formula, atoms_order=null)
     {
         let parser = new Parser();
 
-        for (let i = 0; i < atoms_order.length; i++)
+        if (atoms_order != null)
         {
-            if (typeof atoms_order[i] == "string")
-                atoms_order[i] = parser.parse(atoms_order[i]);
-            else if (atoms_order[i] instanceof Formula);
-            else
-                throw new EvalError("atoms in atoms order must be strings or Formula's");
+            for (let i = 0; i < atoms_order.length; i++)
+            {
+                if (typeof atoms_order[i] == "string")
+                    atoms_order[i] = parser.parse(atoms_order[i]);
+                else if (atoms_order[i] instanceof Formula);
+                else
+                    throw new EvalError("atoms in atoms order must be strings or Formula's");
+            }
+
+            this.#atoms_order = atoms_order;
         }
 
-        this.#atoms_order = atoms_order;
+        else
+            this.#atoms_order = Solver.get_atoms(formula);
 
         if (typeof formula === "string")
             this.#initial_formula = parser.parse(formula);
@@ -321,7 +327,7 @@ export class Solver
 let solver = new Solver()
 let vars = Solver.get_atoms("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))");
 console.log(vars.map((v) => v.string));
-solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))", ["x0", "x1", "x2", "y0", "y1", "y2"]);
+solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))"/*, ["x0", "x1", "x2", "y0", "y1", "y2"]*/);
 // solver.solve("(x & y) | (!x & z) + (x | (y + !z))");
 console.log(solver.robdd_graph_dump(true, false));
 
