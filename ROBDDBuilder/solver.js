@@ -5,6 +5,9 @@ import TreeNode from "../Lib/tree.js";
 export class Solver
 {
     #initial_formula = null;
+    #atoms_order = null;
+    #known_branches = [];
+    robdd = null;
 
     constructor()
     {}
@@ -146,37 +149,79 @@ export class Solver
         }
     }
 
-    #solver_step(formula, variables_order)
+    #solver_step(formula, variable_idx=0)
     {
-        let idx = 0;
-        while (idx < variables_order.length)
+        for (let i = 0; i < this.#known_branches.length; i++)
         {
-            if (formula.contains(variables_order[idx]))
-                break;
-            idx++;
+            if (this.#known_branches[i].formula.equals(formula))
+            {
+                return this.#known_branches[i].robdd_node;
+            }
         }
 
-        if (idx == variables_order.length) // Exiting, if there is no variables in formula
-            return;
+        let current_node = null;
 
-        let current_variable = variables_order[idx];
+        if (formula.opc == Formula.Operator.TRUE || formula.opc == Formula.Operator.FALSE)
+            current_node = new TreeNode((formula.opc == Formula.Operator.TRUE) ? "1" : "0");
 
-        let true_branch_formula = this.#propagate_variable(formula, current_variable, true);
-        true_branch_formula = this.#simplify(true_branch_formula);
-        this.#solver_step(true_branch_formula, variables_order.slice(idx + 1));
+        else
+        {
+            let idx = variable_idx;
+            while (idx < this.#atoms_order.length)
+            {
+                if (formula.contains(this.#atoms_order[idx]))
+                    break;
+                idx++;
+            }
 
-        let false_branch_formula = this.#propagate_variable(formula, current_variable, false);
-        false_branch_formula = this.#simplify(false_branch_formula);
-        this.#solver_step(false_branch_formula, variables_order.slice(idx + 1));
+            if (idx == this.#atoms_order.length) // Exiting, if there is no variables in formula
+                throw new EvalError(`Formula is ${formula.string}, but there is no any variables left to propagate`);
+
+            let current_variable = this.#atoms_order[idx];
+
+            let true_branch_formula = this.#propagate_variable(formula, current_variable, true);
+            true_branch_formula = this.#simplify(true_branch_formula);
+            let false_branch_formula = this.#propagate_variable(formula, current_variable, false);
+            false_branch_formula = this.#simplify(false_branch_formula);
+
+            if (true_branch_formula.equals(false_branch_formula))
+            {
+                current_node = this.#solver_step(true_branch_formula, idx + 1);
+            }
+
+            else
+            {
+                current_node = new TreeNode(current_variable.string);
+                let true_branch_node = this.#solver_step(true_branch_formula, idx + 1);
+                let false_branch_node = this.#solver_step(false_branch_formula, idx + 1);
+                current_node.true_branch = true_branch_node;
+                current_node.false_branch = false_branch_node;
+            }
+        }
+
+        this.#known_branches.push({formula: formula, robdd_node: current_node});
+        return current_node;
     }
 
-    solve(formula)
+    solve(formula, atoms_order)
     {
-        if (typeof formula === "string")
+        let parser = new Parser();
+
+        for (let i = 0; i < atoms_order.length; i++)
         {
-            let parser = new Parser();
-            this.#initial_formula = parser.parse(formula);
+            if (typeof atoms_order[i] == "string")
+                atoms_order[i] = parser.parse(atoms_order[i]);
+            else if (atoms_order[i] instanceof Formula);
+            else
+                throw new EvalError("atoms in atoms order must be strings or Formula's");
         }
+
+        this.#atoms_order = atoms_order;
+
+        if (typeof formula === "string")
+            this.#initial_formula = parser.parse(formula);
+        else if (formula instanceof Formula)
+            this.#initial_formula = Formula.copy(formula);
         else
             return;
 
@@ -184,11 +229,99 @@ export class Solver
         console.log("Simplifiing");
         console.log(this.#simplify(this.#initial_formula).string);
 
+        this.robdd = this.#solver_step(this.#initial_formula);
+    }
+
+    static get_atoms(formula)
+    {
         let parser = new Parser();
-        this.#solver_step(this.#initial_formula, [parser.parse("x"), parser.parse("y"), parser.parse("z")]);
+        let parsed_formula = null;
+
+        if (typeof formula === "string")
+            parsed_formula = parser.parse(formula);
+        else if (formula instanceof Formula)
+            parsed_formula = Formula.copy(formula);
+
+        if (parsed_formula != null)
+            return parsed_formula.variables;
+    }
+
+    robdd_graph_dump(grouping = true, shuffle = false)
+    {
+        let result = `digraph G {\nrankdir=TB;\ngraph[dpi = 300];\nordering=\"${shuffle ? "in" : "out"}\"\n`
+
+        if (!grouping)
+            result += `${this.#recoursive_robdd_graph_dump_nodes(this.robdd).join("\n")}\n`;
+
+        else
+        {
+            for (let i = 0; i < this.#atoms_order.length; i++)
+            {
+                console.log(this.#atoms_order[i].string);
+                result += `subgraph {\nrank=same\n${this.#recoursive_robdd_graph_dump_nodes(this.robdd, true, this.#atoms_order[i]).join("\n")}\n}\n`
+            }
+            result += `subgraph {\nrank=same\n${this.#recoursive_robdd_graph_dump_nodes(this.robdd, true).join("\n")}\n}\n`
+        }
+
+        result += `${this.#recoursive_robdd_graph_dump_edges(this.robdd).join("\n")}\n`;
+
+        result += "}"
+
+        return result
+    }
+
+    #recoursive_robdd_graph_dump_nodes(node, grouping = false, atom_to_dump = null, visited_nodes=[])
+    {
+        if (visited_nodes.indexOf(node) != -1)
+            return [];
+        visited_nodes.push(node);
+
+        let result = [];
+
+        if (
+            !grouping || 
+            (grouping && atom_to_dump != null && node.data == atom_to_dump.string) || 
+            (grouping && atom_to_dump == null && (node.data == "1" || node.data == "0"))
+        )
+            result.push(`id${node.id}[label="${node.data}", shape="${(node.data == "1" || node.data == "0") ? "box" : "circle"}"]`);
+
+        if (node.false_branch)
+            result = result.concat(this.#recoursive_robdd_graph_dump_nodes(node.false_branch, grouping, atom_to_dump, visited_nodes));
+    
+        if (node.true_branch)
+            result = result.concat(this.#recoursive_robdd_graph_dump_nodes(node.true_branch, grouping, atom_to_dump, visited_nodes));
+
+        return result;
+    }
+
+    #recoursive_robdd_graph_dump_edges(node, visited_nodes=[])
+    {
+        if (visited_nodes.indexOf(node) != -1)
+            return [];
+        visited_nodes.push(node);
+
+        let result = [];
+
+        if (node.false_branch)
+        {
+            result.push(`id${node.id}->id${node.false_branch.id}[style=dashed]`);
+            result = result.concat(this.#recoursive_robdd_graph_dump_edges(node.false_branch, visited_nodes));
+        }
+
+        if (node.true_branch)
+        {
+            result.push(`id${node.id}->id${node.true_branch.id}`);
+            result = result.concat(this.#recoursive_robdd_graph_dump_edges(node.true_branch, visited_nodes));
+        }
+
+        return result;
     }
 }
 
 let solver = new Solver()
-// solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))");
-solver.solve("(x & y) | (!x & z) + (x | (y + !z))");
+let vars = Solver.get_atoms("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))");
+console.log(vars.map((v) => v.string));
+solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))", ["x0", "x1", "x2", "y0", "y1", "y2"]);
+// solver.solve("(x & y) | (!x & z) + (x | (y + !z))");
+console.log(solver.robdd_graph_dump(true, false));
+
