@@ -9,6 +9,13 @@ export class Solver
     #known_branches = [];
     robdd = null;
     #solution_steps = [];
+    #solution_line = 0;
+    #suspicious_solution = false;
+
+    get solution_steps()
+    {
+        return this.#solution_steps;
+    }
 
     constructor()
     {}
@@ -150,14 +157,25 @@ export class Solver
         }
     }
 
-    #solver_step(formula, variable_idx=0, depth = 0)
+    #find_formula_mention(formula)
     {
         for (let i = 0; i < this.#known_branches.length; i++)
         {
             if (this.#known_branches[i].formula.equals(formula))
-            {
+                return this.#known_branches[i].line;
+        }
+
+        return 0;
+    }
+
+    #solver_step(formula, variable_idx=0, depth = 0)
+    {
+        let current_line = this.#solution_line;
+
+        for (let i = 0; i < this.#known_branches.length; i++)
+        {
+            if (this.#known_branches[i].formula.equals(formula))
                 return this.#known_branches[i].robdd_node;
-            }
         }
 
         let current_node = null;
@@ -182,25 +200,36 @@ export class Solver
 
             let true_branch_formula = this.#propagate_variable(formula, current_variable, true);
             true_branch_formula = this.#simplify(true_branch_formula);
+
             let false_branch_formula = this.#propagate_variable(formula, current_variable, false);
             false_branch_formula = this.#simplify(false_branch_formula);
 
             if (true_branch_formula.equals(false_branch_formula))
             {
-                current_node = this.#solver_step(true_branch_formula, idx + 1, depth + 1);
+                this.#suspicious_solution = true;
+                current_node = this.#solver_step(true_branch_formula, idx + 1, depth);
             }
 
             else
             {
                 current_node = new TreeNode(current_variable.string);
+
+                let true_branch_mention = (this.#find_formula_mention(true_branch_formula) == 0) ? "" : ` (Already mentioned in line ${this.#find_formula_mention(true_branch_formula)})`;
+                console.log(`${++this.#solution_line} ${Array(depth).fill("\t").join("")}${current_variable.string} = 1: ${true_branch_formula.string}${true_branch_mention}`);
+                this.#solution_steps.push({depth: depth, step_no: this.#solution_line, step: `${current_variable.latex} = 1: ${true_branch_formula.latex}`, mention: this.#find_formula_mention(true_branch_formula)});
                 let true_branch_node = this.#solver_step(true_branch_formula, idx + 1, depth + 1);
+
+                let false_branch_mention = (this.#find_formula_mention(false_branch_formula) == 0) ? "" : ` (Already mentioned in line ${this.#find_formula_mention(false_branch_formula)})`;
+                console.log(`${++this.#solution_line} ${Array(depth).fill("\t").join("")}${current_variable.string} = 0: ${false_branch_formula.string}${false_branch_mention}`);
+                this.#solution_steps.push({depth: depth, step_no: this.#solution_line, step: `${current_variable.latex} = 0: ${false_branch_formula.latex}`, mention: this.#find_formula_mention(false_branch_formula)});
                 let false_branch_node = this.#solver_step(false_branch_formula, idx + 1, depth + 1);
+                
                 current_node.true_branch = true_branch_node;
                 current_node.false_branch = false_branch_node;
             }
         }
 
-        this.#known_branches.push({formula: formula, robdd_node: current_node});
+        this.#known_branches.push({formula: formula, robdd_node: current_node, line: current_line});
         return current_node;
     }
 
@@ -232,9 +261,7 @@ export class Solver
         else
             return;
 
-        console.log(this.#initial_formula.string);
-        console.log("Simplifiing");
-        console.log(this.#simplify(this.#initial_formula).string);
+        console.log(`Building ROBDD graph for ${this.#initial_formula.string}`);
 
         this.robdd = this.#solver_step(this.#initial_formula);
     }
@@ -327,6 +354,3 @@ let solver = new Solver()
 let vars = Solver.get_atoms("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))");
 console.log(vars.map((v) => v.string));
 solver.solve("(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))", ["x0", "x1", "x2", "y0", "y1", "y2"]);
-// solver.solve("(x & y) | (!x & z) + (x | (y + !z))");
-console.log(solver.robdd_graph_dump(true, false));
-
