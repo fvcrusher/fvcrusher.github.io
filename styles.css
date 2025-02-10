@@ -142,6 +142,10 @@ input[type="text"] {
     text-align: left;
 }
 
+.wide-output {
+    overflow-x: auto;
+}
+
 .contents {
     margin-top: 20px;
     margin: auto;

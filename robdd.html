@@ -104,6 +104,23 @@
                 container.removeChild(to_remove[0]);
         }
 
+        function add_paragraph(container, text, latex=false, warning=false) {
+            let par = document.createElement("p");
+            par.classList.add("generated-output");
+            if (latex)
+                par.classList.add("latex-string");
+            if (warning)
+                par.classList.add("warning");
+            if (typeof text === "string")
+            {
+                let txt = document.createTextNode(text);
+                par.appendChild(txt);
+            }
+            else
+                par.appendChild(text);
+            container.appendChild(par);
+        }
+
         function run_solver() {
             const inputField = document.getElementById("textInput");
             const outputDiv = document.getElementById("output");
@@ -112,6 +129,13 @@
             solver.solve(inputField.value);
 
             clear_output(outputDiv);
+
+            let solution = document.createElement("div");
+            for (let step = 0; step < solver.solution_steps.length; step++)
+            {
+                add_paragraph(solution, `\$${solver.solution_steps}\$`, true);
+            }
+            outputDiv.appendChild(solution);
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
         }
