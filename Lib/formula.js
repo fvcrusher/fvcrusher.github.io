@@ -292,7 +292,7 @@ class Formula
             }
         }
 
-        if (this.opc == Formula.Operator.ATOM && !variables.some((variable) => variable.equals(this)))
+        if (this.opc == Formula.Operator.ATOM && !variables.some((variable) => variable.equals(this)) && this.name != "")
             variables.push(Formula.copy(this))
 
         return variables;
