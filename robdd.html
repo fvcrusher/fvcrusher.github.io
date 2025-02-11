@@ -22,6 +22,8 @@
         });
     </script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
 </head>
 <body>
@@ -173,6 +175,14 @@
                 solution.appendChild(par);
             }
             outputDiv.appendChild(solution);
+
+            const viz = new Viz();
+            let graph_container = document.createElement("div");
+            graph_container.classList.add("generated-output", "wide-output", "graph");
+
+            viz.renderSVGElement(solver.robdd_graph_dump()).then(element => {graph_container.appendChild(element)});
+
+            outputDiv.appendChild(graph_container);
 
             outputDiv.style.display = "block";
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);

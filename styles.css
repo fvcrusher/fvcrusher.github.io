@@ -365,3 +365,8 @@ ul {
 .inactive:hover {
     background-color: transparent;
 }
+
+svg {
+    display: block;
+    margin: auto;
+}

@@ -282,7 +282,7 @@ export class Solver
 
     robdd_graph_dump(grouping = true, shuffle = false)
     {
-        let result = `digraph G { rankdir=TB; ordering=\"${shuffle ? "in" : "out"}\"\n`
+        let result = `digraph G { rankdir=TB; ordering=\"${shuffle ? "in" : "out"}\"; bgcolor="transparent"\n`
 
         if (!grouping)
             result += `${this.#recursive_robdd_graph_dump_nodes(this.robdd).join("\n")}\n`;
