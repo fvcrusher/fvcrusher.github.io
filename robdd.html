@@ -141,17 +141,23 @@
             solution.classList.add("wide-output");
             for (let step = 0; step < solver.solution_steps.length; step++)
             {
-                let txt = document.createTextNode(`\$${solver.solution_steps[step].step}\$`);
                 let par = document.createElement("p");
                 par.classList.add("generated-output", "latex-string", "robdd-solution-line");
 
+                let num_container = document.createElement("div");
+                num_container.classList.add("line-number");
+                let tt = document.createElement("tt");
+                tt.appendChild(document.createTextNode(`${solver.solution_steps[step].step_no}`))
+                num_container.appendChild(tt);
+                par.appendChild(num_container);
+                
                 for (let d = 0; d < solver.solution_steps[step].depth; d++)
                 {
                     let tab_hint = document.createElement("div");
                     tab_hint.classList.add("tabulation-hint");
                     par.appendChild(tab_hint);
                 }
-                par.appendChild(txt);
+                par.appendChild(document.createTextNode(`\$${solver.solution_steps[step].step}\$`));
                 solution.appendChild(par);
             }
             outputDiv.appendChild(solution);
