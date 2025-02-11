@@ -104,13 +104,18 @@
                 container.removeChild(to_remove[0]);
         }
 
-        function add_paragraph(container, text, latex=false, warning=false) {
+        function add_paragraph(container, text, latex=false, warning=false, class_list = null) {
             let par = document.createElement("p");
             par.classList.add("generated-output");
             if (latex)
                 par.classList.add("latex-string");
             if (warning)
                 par.classList.add("warning");
+            if (class_list != null)
+            {
+                for (let i = 0; i < class_list.length; i++)
+                    par.classList.add(class_list[i]);
+            }
             if (typeof text === "string")
             {
                 let txt = document.createTextNode(text);
@@ -119,6 +124,8 @@
             else
                 par.appendChild(text);
             container.appendChild(par);
+
+            return par;
         }
 
         function run_solver() {
@@ -131,9 +138,21 @@
             clear_output(outputDiv);
 
             let solution = document.createElement("div");
+            solution.classList.add("wide-output");
             for (let step = 0; step < solver.solution_steps.length; step++)
             {
-                add_paragraph(solution, `\$${solver.solution_steps[step].step}\$`, true);
+                let txt = document.createTextNode(`\$${solver.solution_steps[step].step}\$`);
+                let par = document.createElement("p");
+                par.classList.add("generated-output", "latex-string", "robdd-solution-line");
+
+                for (let d = 0; d < solver.solution_steps[step].depth; d++)
+                {
+                    let tab_hint = document.createElement("div");
+                    tab_hint.classList.add("tabulation-hint");
+                    par.appendChild(tab_hint);
+                }
+                par.appendChild(txt);
+                solution.appendChild(par);
             }
             outputDiv.appendChild(solution);
 
