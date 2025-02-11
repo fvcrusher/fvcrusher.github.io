@@ -143,6 +143,7 @@
             {
                 let par = document.createElement("p");
                 par.classList.add("latex-string", "robdd-solution-line");
+                par.id = `solution-line-${solver.solution_steps[step].step_no}`;
 
                 let num_container = document.createElement("div");
                 num_container.classList.add("line-number");
@@ -158,12 +159,28 @@
                     par.appendChild(tab_hint);
                 }
                 par.appendChild(document.createTextNode(`\$${solver.solution_steps[step].step}\$`));
+
+                if (solver.solution_steps[step].mention != 0)
+                {
+                    let mention_btn = document.createElement("button");
+                    mention_btn.classList.add("mention-button");
+                    mention_btn.textContent = `Уже найдено в строке ${solver.solution_steps[step].mention}`;
+                    mention_btn.onclick = function() { hilight_solution_line(solver.solution_steps[step].mention); };
+                    par.appendChild(mention_btn);
+                }
+
                 solution.appendChild(par);
             }
             outputDiv.appendChild(solution);
 
             outputDiv.style.display = "block";
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        }
+
+        function hilight_solution_line(line_no)
+        {
+            let solution_line_id = `solution-line-${line_no}`;
+            console.log(`Hilighting line with id <${solution_line_id}>`);
         }
     </script>
 </body>
