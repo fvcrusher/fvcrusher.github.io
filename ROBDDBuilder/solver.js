@@ -237,7 +237,7 @@ export class Solver
     {
         let parser = new Parser();
 
-        if (atoms_order != null)
+        if (atoms_order != null && atoms_order.length == Solver.get_atoms(formula))
         {
             for (let i = 0; i < atoms_order.length; i++)
             {
