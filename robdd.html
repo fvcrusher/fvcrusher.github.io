@@ -138,11 +138,11 @@
             clear_output(outputDiv);
 
             let solution = document.createElement("div");
-            solution.classList.add("wide-output");
+            solution.classList.add("wide-output", "generated-output");
             for (let step = 0; step < solver.solution_steps.length; step++)
             {
                 let par = document.createElement("p");
-                par.classList.add("generated-output", "latex-string", "robdd-solution-line");
+                par.classList.add("latex-string", "robdd-solution-line");
 
                 let num_container = document.createElement("div");
                 num_container.classList.add("line-number");
