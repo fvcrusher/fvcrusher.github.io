@@ -164,8 +164,9 @@
                 {
                     let mention_btn = document.createElement("button");
                     mention_btn.classList.add("mention-button");
+                    mention_btn.id = `mention-button-${solver.solution_steps[step].step_no}`;
                     mention_btn.textContent = `Уже найдено в строке ${solver.solution_steps[step].mention}`;
-                    mention_btn.onclick = function() { hilight_solution_line(solver.solution_steps[step].mention); };
+                    mention_btn.onclick = function() { hilight_solution_line(solver.solution_steps[step].mention, solver.solution_steps[step].step_no); };
                     par.appendChild(mention_btn);
                 }
 
@@ -177,10 +178,29 @@
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
         }
 
-        function hilight_solution_line(line_no)
+        function hilight_solution_line(mentioned_line_no, source_line_no)
         {
-            let solution_line_id = `solution-line-${line_no}`;
-            console.log(`Hilighting line with id <${solution_line_id}>`);
+            const all_lines = document.getElementsByClassName("robdd-solution-line");
+            for (let i = 0; i < all_lines.length; i++)
+                all_lines[i].style.removeProperty("background-color");
+            const all_buttons = document.getElementsByClassName("mention-button");
+            for (let i = 0; i < all_buttons.length; i++)
+            {
+                all_buttons[i].style.removeProperty("background-color");
+                all_buttons[i].style.removeProperty("color");
+                all_buttons[i].style.removeProperty("cursor");
+            }
+
+            let solution_line_id = `solution-line-${mentioned_line_no}`;
+            let source_button_id = `mention-button-${source_line_no}`;
+
+            const mentioned_line = document.getElementById(solution_line_id);
+            const source_button = document.getElementById(source_button_id);
+
+            mentioned_line.style.backgroundColor = "yellow";
+            source_button.style.backgroundColor = "yellow";
+            source_button.style.color = "black";
+            source_button.style.cursor = "default";
         }
     </script>
 </body>

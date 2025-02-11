@@ -168,6 +168,7 @@ input[type="text"] {
 .robdd-solution-line {
     text-align: left;
     display: flex;
+    transition: 0.3s;
 }
 
 .line-number {
@@ -192,7 +193,8 @@ input[type="text"] {
     background: transparent;
     margin: auto 10px;
     color: gray;
-    transition: color 0.3s;
+    transition: 0.3s;
+    cursor: context-menu;
 }
 
 .mention-button:hover {
