@@ -216,6 +216,14 @@
             source_button.style.color = "black";
             source_button.style.cursor = "default";
         }
+
+        function update_var_list()
+        {
+            const inputField = document.getElementById("expression");
+            //console.log(ROBDDBuilder.Solver.get_atoms(inputField.value).map(atom => atom.string));
+            console.log("Auto-updating atoms is not working yet");
+        }
+        document.getElementById("expression").addEventListener("input", update_var_list);
     </script>
 </body>
 </html>
