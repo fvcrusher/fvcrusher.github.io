@@ -17,6 +17,16 @@ export class Solver
         return this.#solution_steps;
     }
 
+    get initial_formula()
+    {
+        return this.#initial_formula;
+    }
+
+    get atoms_order()
+    {
+        return this.#atoms_order;
+    }
+
     constructor()
     {}
 

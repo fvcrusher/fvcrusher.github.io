@@ -143,6 +143,8 @@
 
             clear_output(outputDiv);
 
+            add_paragraph(outputDiv, `Построим граф ROBDD для выражения \$${solver.initial_formula.compact_latex}\$. Для этого будем подставлять значения переменных (\$1\$ или \$0\$) согласно указанному порядку переменных: \$${solver.atoms_order.map(atom => atom.compact_latex).join(" \\prec ")}\$. В случае, если будет получено выражение, уже полученное в другой ветке перебора, в графе ROBDD будем ссылаться на уже существующий узел.`);
+
             let solution = document.createElement("div");
             solution.classList.add("wide-output", "generated-output");
             for (let step = 0; step < solver.solution_steps.length; step++)
