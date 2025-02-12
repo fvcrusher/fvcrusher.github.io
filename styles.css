@@ -353,10 +353,6 @@ ul {
     }
 }
 
-.bi {
-    vertical-align: -.125em;
-}
-
 .inactive {
     color: rgba(255, 255, 255, 0.3);
     cursor: not-allowed;
@@ -369,4 +365,9 @@ ul {
 svg {
     display: block;
     margin: auto;
+}
+
+svg.logo {
+    display: inline;
+    vertical-align: -.125em;
 }
