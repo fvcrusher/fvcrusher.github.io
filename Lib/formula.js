@@ -21,23 +21,23 @@ class Formula
         }
     }
 
-    static text_of(opc, latex=false)
+    static text_of(opc, latex=false, compact=false)
     {
         switch (opc)
         {
-            case Formula.Operator.TRUE: return latex ? "\\mathtt{true}" : "true";
-            case Formula.Operator.FALSE: return latex ? "\\mathtt{false}" : "false";
-            case Formula.Operator.NOT: return latex ? "\\mathbf{\\neg}" : "!";
-            case Formula.Operator.X: return latex ? "\\mathbf{X}" : "X";
-            case Formula.Operator.F: return latex ? "\\mathbf{F}" : "F";
-            case Formula.Operator.G: return latex ? "\\mathbf{G}" : "G";
-            case Formula.Operator.AND: return latex ? "\\hspace{0.1cm}\\mathbf{\\wedge}\\hspace{0.1cm}" : "&";
-            case Formula.Operator.OR: return latex ? "\\hspace{0.1cm}\\mathbf{\\vee}\\hspace{0.1cm}" : "|";
-            case Formula.Operator.IMPL: return latex ? "\\hspace{0.1cm}\\mathbf{\\rightarrow}\\hspace{0.1cm}" : "->";
-            case Formula.Operator.XOR: return latex ? "\\hspace{0.1cm}\\mathbf{\\oplus}\\hspace{0.1cm}" : "+";
-            case Formula.Operator.U: return latex ? "\\hspace{0.1cm}\\mathbf{U}\\hspace{0.1cm}" : "U";
-            case Formula.Operator.R: return latex ? "\\hspace{0.1cm}\\mathbf{W}\\hspace{0.1cm}" : "R";
-            case Formula.Operator.W: return latex ? "\\hspace{0.1cm}\\mathbf{R}\\hspace{0.1cm}" : "W";
+            case Formula.Operator.TRUE: return compact ? "1" : (latex ? "\\mathtt{true}" : "true");
+            case Formula.Operator.FALSE: return compact ? "0" : (latex ? "\\mathtt{false}" : "false");
+            case Formula.Operator.NOT: return latex ? "\\mathbf{\\neg} " : "!";
+            case Formula.Operator.X: return latex ? "\\mathbf{X} " : "X";
+            case Formula.Operator.F: return latex ? "\\mathbf{F} " : "F";
+            case Formula.Operator.G: return latex ? "\\mathbf{G} " : "G";
+            case Formula.Operator.AND: return latex ? (compact ? " \\hspace{0.05cm} " : " \\hspace{0.1cm}\\mathbf{\\wedge}\\hspace{0.1cm} ") : (compact ? "" : " & ");
+            case Formula.Operator.OR: return latex ? " \\hspace{0.1cm}\\mathbf{\\vee}\\hspace{0.1cm} " : " | ";
+            case Formula.Operator.IMPL: return latex ? " \\hspace{0.1cm}\\mathbf{\\rightarrow}\\hspace{0.1cm} " : " -> ";
+            case Formula.Operator.XOR: return latex ? " \\hspace{0.1cm}\\mathbf{\\oplus}\\hspace{0.1cm} " : " + ";
+            case Formula.Operator.U: return latex ? " \\hspace{0.1cm}\\mathbf{U}\\hspace{0.1cm} " : " U ";
+            case Formula.Operator.R: return latex ? " \\hspace{0.1cm}\\mathbf{W}\\hspace{0.1cm} " : " R ";
+            case Formula.Operator.W: return latex ? " \\hspace{0.1cm}\\mathbf{R}\\hspace{0.1cm} " : " W ";
             default: return "?";
         }
     }
@@ -180,21 +180,22 @@ class Formula
         return contains;
     }
 
-    static #need_wrapping(opc, nested_opc)
+    static #no_need_wrapping(opc, nested_opc, compact=false)
     {
         return (
             (opc === Formula.Operator.AND && nested_opc === Formula.Operator.AND) ||
             (opc === Formula.Operator.OR && nested_opc === Formula.Operator.OR) ||
-            (opc === Formula.Operator.XOR && nested_opc === Formula.Operator.XOR)
+            (opc === Formula.Operator.XOR && nested_opc === Formula.Operator.XOR) ||
+            (compact && nested_opc === Formula.Operator.AND)
         )
     }
 
-    #to_string_internal(wrap=false, latex=false, definitions=[], announce=[])
+    #to_string_internal(wrap=false, latex=false, compact=false, definitions=[], announce=[])
     {
         let str = "";
 
-        let wrap_lop = (this.lop != null && Formula.#need_wrapping(this.opc, this.lop.opc)) ? false : true;
-        let wrap_rop = (this.rop != null && Formula.#need_wrapping(this.opc, this.rop.opc)) ? false : true;
+        let wrap_lop = (this.lop != null && Formula.#no_need_wrapping(this.opc, this.lop.opc, compact)) ? false : true;
+        let wrap_rop = (this.rop != null && Formula.#no_need_wrapping(this.opc, this.rop.opc, compact)) ? false : true;
 
         let announce_definition = -1;
 
@@ -220,7 +221,7 @@ class Formula
         {
             case Formula.Operator.TRUE:
             case Formula.Operator.FALSE:
-                str += `${Formula.text_of(this.opc, latex)}`;
+                str += `${Formula.text_of(this.opc, latex, compact)}`;
                 break;
             
             case Formula.Operator.ATOM:
@@ -228,10 +229,15 @@ class Formula
                 break;
 
             case Formula.Operator.NOT:
+                if (compact)
+                {
+                    str += `\\overline{${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}}`;
+                    break;
+                }
             case Formula.Operator.X:
             case Formula.Operator.F:
             case Formula.Operator.G:
-                str += `${Formula.text_of(this.opc, latex)}${this.lop.#to_string_internal(wrap_lop, latex, definitions, announce)}`;
+                str += `${Formula.text_of(this.opc, latex, compact)}${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}`;
                 break;
 
             case Formula.Operator.AND:
@@ -241,7 +247,7 @@ class Formula
             case Formula.Operator.U:
             case Formula.Operator.W:
             case Formula.Operator.R:
-                let res = `${this.lop.#to_string_internal(wrap_lop, latex, definitions, announce)} ${Formula.text_of(this.opc, latex)} ${this.rop.#to_string_internal(wrap_rop, latex, definitions, announce)}`;
+                let res = `${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}${Formula.text_of(this.opc, latex, compact)}${this.rop.#to_string_internal(wrap_rop, latex, compact, definitions, announce)}`;
                 str += (wrap ? `(${res})` : res);
                 break;
 
@@ -257,22 +263,27 @@ class Formula
 
     get string()
     {
-        return this.#to_string_internal(false, false);
+        return this.#to_string_internal(false, false, false);
     }
 
     def_string(definitions, announce=[])
     {
-        return this.#to_string_internal(false, false, definitions, announce);
+        return this.#to_string_internal(false, false, false, definitions, announce);
     }
 
     get latex()
     {
-        return this.#to_string_internal(false, true);
+        return this.#to_string_internal(false, true, false);
     }
 
     def_latex(definitions, announce=[])
     {
-        return this.#to_string_internal(false, true, definitions, announce);
+        return this.#to_string_internal(false, true, false, definitions, announce);
+    }
+
+    get compact_latex()
+    {
+        return this.#to_string_internal(false, true, true);
     }
 
     get variables()

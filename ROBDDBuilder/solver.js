@@ -216,12 +216,12 @@ export class Solver
 
                 let true_branch_mention = (this.#find_formula_mention(true_branch_formula) == 0) ? "" : ` (Already mentioned in line ${this.#find_formula_mention(true_branch_formula)})`;
                 console.log(`${++this.#solution_line} ${Array(depth).fill("\t").join("")}${current_variable.string} = 1: ${true_branch_formula.string}${true_branch_mention}`);
-                this.#solution_steps.push({depth: depth, step_no: this.#solution_line, step: `${current_variable.latex} = 1: ${true_branch_formula.latex}`, mention: this.#find_formula_mention(true_branch_formula)});
+                this.#solution_steps.push({depth: depth, step_no: this.#solution_line, step: `${current_variable.compact_latex} = 1: ${true_branch_formula.compact_latex}`, mention: this.#find_formula_mention(true_branch_formula)});
                 let true_branch_node = this.#solver_step(true_branch_formula, idx + 1, depth + 1);
 
                 let false_branch_mention = (this.#find_formula_mention(false_branch_formula) == 0) ? "" : ` (Already mentioned in line ${this.#find_formula_mention(false_branch_formula)})`;
                 console.log(`${++this.#solution_line} ${Array(depth).fill("\t").join("")}${current_variable.string} = 0: ${false_branch_formula.string}${false_branch_mention}`);
-                this.#solution_steps.push({depth: depth, step_no: this.#solution_line, step: `${current_variable.latex} = 0: ${false_branch_formula.latex}`, mention: this.#find_formula_mention(false_branch_formula)});
+                this.#solution_steps.push({depth: depth, step_no: this.#solution_line, step: `${current_variable.compact_latex} = 0: ${false_branch_formula.compact_latex}`, mention: this.#find_formula_mention(false_branch_formula)});
                 let false_branch_node = this.#solver_step(false_branch_formula, idx + 1, depth + 1);
                 
                 current_node.true_branch = true_branch_node;
