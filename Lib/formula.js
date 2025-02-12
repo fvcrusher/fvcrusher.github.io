@@ -31,7 +31,7 @@ class Formula
             case Formula.Operator.X: return latex ? "\\mathbf{X} " : "X";
             case Formula.Operator.F: return latex ? "\\mathbf{F} " : "F";
             case Formula.Operator.G: return latex ? "\\mathbf{G} " : "G";
-            case Formula.Operator.AND: return latex ? (compact ? " \\hspace{0.05cm} " : " \\hspace{0.1cm}\\mathbf{\\wedge}\\hspace{0.1cm} ") : (compact ? "" : " & ");
+            case Formula.Operator.AND: return latex ? (compact ? " \\hspace{0.075cm} " : " \\hspace{0.1cm}\\mathbf{\\wedge}\\hspace{0.1cm} ") : (compact ? "" : " & ");
             case Formula.Operator.OR: return latex ? " \\hspace{0.1cm}\\mathbf{\\vee}\\hspace{0.1cm} " : " | ";
             case Formula.Operator.IMPL: return latex ? " \\hspace{0.1cm}\\mathbf{\\rightarrow}\\hspace{0.1cm} " : " -> ";
             case Formula.Operator.XOR: return latex ? " \\hspace{0.1cm}\\mathbf{\\oplus}\\hspace{0.1cm} " : " + ";
