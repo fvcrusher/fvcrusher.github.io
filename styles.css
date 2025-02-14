@@ -446,7 +446,7 @@ input:checked + .slider:before {
 @media (max-width: 1000px) 
 {
     .graph {
-        flex-direction: column-reverse;
+        flex-direction: column;
         display: flex;
         justify-content: space-between;
     }
