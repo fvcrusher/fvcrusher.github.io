@@ -65,7 +65,7 @@ label {
 input[type="text"] {
     width: 100%;
     padding: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1em;
@@ -444,6 +444,15 @@ input:checked + .slider:before {
     margin-left: 7px;
 }
 
+.switch-container {
+    width: fit-content;
+}
+
 .robdd-settings {
     padding: 10px;
+}
+
+.ltl2buchi-settings {
+    display: flex;
+    flex-direction: column;
 }
