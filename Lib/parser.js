@@ -128,4 +128,171 @@ class Parser
     }
 }
 
+class NewParser
+{
+    static #isAtomSymbol(str)
+    {
+        return str.length === 1 && str.match(/[\w\d]/i);
+    }
+
+    static #isSpace(str)
+    {
+        return str.length === 1 && str.match(/\s/i);
+    }
+
+    #skip_empty()
+    {
+        while (!this.#stream.end && NewParser.#isSpace(this.#stream.current))
+            this.#stream.next();
+    }
+
+    #stream = null;
+
+    parse(formula)
+    {
+        this.#stream = new Stream(formula);
+        return this.GetImpl();
+    }
+
+    GetImpl()
+    {
+        this.#skip_empty();
+        let lop = this.GetXor();
+        this.#skip_empty();
+
+        while (!this.#stream.end_at(2) && this.#stream.slice(0, 2) == "->")
+        {
+            this.#stream.move(2);
+            this.#skip_empty();
+            let rop = this.GetXor();
+            this.#skip_empty();
+            lop = Formula.binary(Formula.Operator.IMPL, lop, rop);
+        }
+
+        return lop;
+    }
+
+    GetXor()
+    {
+        this.#skip_empty();
+        let lop = this.GetOr();
+        this.#skip_empty();
+
+        while (this.#stream.current == "+")
+        {
+            this.#stream.next();
+            this.#skip_empty();
+            let rop = this.GetOr();
+            this.#skip_empty();
+            lop = Formula.binary(Formula.Operator.XOR, lop, rop);
+            this.#skip_empty();
+        }
+
+        return lop;
+    }
+
+    GetOr()
+    {
+        this.#skip_empty();
+        let lop = this.GetAnd();
+        this.#skip_empty();
+
+        while (this.#stream.current == "|")
+        {
+            this.#stream.next();
+            this.#skip_empty();
+            let rop = this.GetAnd();
+            this.#skip_empty();
+            lop = Formula.binary(Formula.Operator.OR, lop, rop);
+            this.#skip_empty();
+        }
+
+        return lop;
+    }
+
+    GetAnd()
+    {
+        this.#skip_empty();
+        let lop = this.GetNot();
+        this.#skip_empty();
+
+        while (this.#stream.current == "&")
+        {
+            this.#stream.next();
+            this.#skip_empty();
+            let rop = this.GetNot();
+            this.#skip_empty();
+            lop = Formula.binary(Formula.Operator.AND, lop, rop);
+            this.#skip_empty();
+        }
+
+        return lop;
+    }
+
+    GetNot()
+    {
+        this.#skip_empty();
+        if (this.#stream.current == "!")
+        {
+            this.#stream.next();
+            this.#skip_empty();
+            let lop = this.GetNot();
+            this.#skip_empty();
+            return Formula.unary(Formula.Operator.NOT, lop);
+        }
+        
+        return this.GetLtlOps();
+    }
+
+    GetLtlOps()
+    {
+        this.#skip_empty();
+
+        return this.GetSubExpression();
+    }
+
+    GetSubExpression()
+    {
+        this.#skip_empty();
+        if (this.#stream.current == "(")
+        {
+            this.#stream.next();
+            this.#skip_empty();
+            let expression = this.GetImpl();
+            this.#skip_empty();
+            this.#stream.next();
+            this.#skip_empty();
+
+            return expression;
+        }
+        else 
+            return this.GetAtom();
+    }
+
+    GetAtom()
+    {
+        this.#skip_empty();
+        let len = 0;
+        while (!this.#stream.end_at(len) && NewParser.#isAtomSymbol(this.#stream.at(len)))
+            len++;
+
+        let name = this.#stream.slice(0, len);
+        this.#stream.move(len);
+
+        switch (name)
+        {
+            case "true":
+            case "1":
+                return new Formula.true();
+
+            case "false":
+            case "0":
+                return new Formula.false();
+
+            default:
+                return new Formula(name);
+        }
+    }
+}
+
 export default Parser;

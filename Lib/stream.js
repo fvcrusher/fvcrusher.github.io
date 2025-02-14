@@ -51,6 +51,11 @@ class Stream
     {
         return this.#counter + cnt >= this.#str.length;
     }
+
+    get left_str()
+    {
+        return this.#str.slice(this.#counter, this.#str.length);
+    }
 }
 
 export default Stream;
