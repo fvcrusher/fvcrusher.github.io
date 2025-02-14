@@ -434,10 +434,22 @@ input:checked + .slider:before {
     border-radius: 50%;
 } 
 
-.graph {
-    flex-direction: row-reverse;
-    display: flex;
-    justify-content: space-between;
+@media (min-width: 1001px) 
+{
+    .graph {
+        flex-direction: row-reverse;
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 1000px) 
+{
+    .graph {
+        flex-direction: column-reverse;
+        display: flex;
+        justify-content: space-between;
+    }
 }
 
 .toggle-label {
