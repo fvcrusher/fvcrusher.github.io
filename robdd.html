@@ -101,6 +101,21 @@
         </div>
     </footer>
     <script>
+
+        let last_solver = null;
+
+        function redraw_graph()
+        {
+            const grouping_toggle = document.getElementById("robdd-grouping");
+            const shuffling_toggle = document.getElementById("robdd-shuffling");
+
+            let graph_container = document.getElementById("graph-container");
+            graph_container.removeChild(document.getElementById("generated-graph"));
+
+            const viz = new Viz();
+            viz.renderSVGElement(last_solver.robdd_graph_dump(grouping_toggle.checked, shuffling_toggle.checked)).then(element => { element.id = "generated-graph"; element.classList.add("generated-graph"); graph_container.appendChild(element); });
+        }
+
         function clear_output(container) {
             let to_remove = container.getElementsByClassName("generated-output");
             while (to_remove.length > 0)
@@ -131,6 +146,44 @@
             return par;
         }
 
+        function generate_switch(id, text, callee, checked=false)
+        {
+            let switch_div = document.createElement("div");
+            switch_div.classList.add("switch-container");
+
+            let switch_label = document.createElement("label");
+            switch_label.classList.add("switch");
+
+            let switch_input = document.createElement("input");
+            switch_input.id = id;
+            switch_input.type = "checkbox";
+            switch_input.onchange = callee;
+            switch_input.checked = checked;
+
+            let switch_slider = document.createElement("span");
+            switch_slider.classList.add("slider", "round");
+
+            let switch_text = document.createElement("span");
+            switch_text.appendChild(document.createTextNode(text));
+            switch_text.classList.add("toggle-label");
+
+            switch_div.appendChild(switch_label);
+            switch_div.appendChild(switch_text);
+            switch_label.appendChild(switch_input);
+            switch_label.appendChild(switch_slider);
+
+            return switch_div;
+        }
+
+        function generate_robdd_settings_div() {
+            let div = document.createElement("div");
+            div.classList.add("robdd-settings");
+            div.appendChild(generate_switch("robdd-grouping", "Группировка узлов по переменным", redraw_graph, true));
+            div.appendChild(generate_switch("robdd-shuffling", "Альтернативный вид графа", redraw_graph));
+
+            return div;
+        }
+
         function run_solver() {
             const inputField = document.getElementById("expression");
             const atomsOrder = document.getElementById("atomsOrder");
@@ -140,6 +193,7 @@
 
             let solver = new ROBDDBuilder.Solver();
             solver.solve(inputField.value, order);
+            last_solver = solver;
 
             clear_output(outputDiv);
 
@@ -185,8 +239,10 @@
             const viz = new Viz();
             let graph_container = document.createElement("div");
             graph_container.classList.add("generated-output", "wide-output", "graph");
+            graph_container.id = "graph-container";
 
-            viz.renderSVGElement(solver.robdd_graph_dump()).then(element => {graph_container.appendChild(element)});
+            graph_container.appendChild(generate_robdd_settings_div());
+            viz.renderSVGElement(solver.robdd_graph_dump()).then(element => { element.id = "generated-graph"; element.classList.add("generated-graph"); graph_container.appendChild(element); });
 
             outputDiv.appendChild(graph_container);
 
