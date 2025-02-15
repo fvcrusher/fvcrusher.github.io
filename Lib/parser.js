@@ -279,7 +279,7 @@ class Parser
     GetUnaryLtlOps()
     {
         this.#skip_empty();
-        if (["F", "G"].indexOf(this.#stream.current) != -1)
+        if (["X", "F", "G"].indexOf(this.#stream.current) != -1)
         {
             let op = this.#stream.current;
             this.#stream.next();
@@ -288,6 +288,8 @@ class Parser
             this.#skip_empty();
             switch (op)
             {
+                case "X":
+                    return Formula.unary(Formula.Operator.X, lop);
                 case "F":
                     return Formula.unary(Formula.Operator.F, lop);
                 case "G":
