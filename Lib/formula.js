@@ -110,7 +110,8 @@ class Formula
             IMPL: 10,
             U: 11,
             W: 12,
-            R: 13
+            R: 13,
+            ERROR_NODE: -1
         }
     )
 
@@ -118,6 +119,9 @@ class Formula
     rop = null;
     opc = null;
     name = null;
+
+    #err_node = false;
+    #err_message = null;
 
     constructor(operator)
     {
@@ -155,6 +159,41 @@ class Formula
         node.lop = l_operand;
         node.rop = r_operand;
         return node;
+    }
+
+    static error(message)
+    {
+        let node = new Formula(Formula.Operator.ERROR_NODE);
+        node.#err_node = true;
+        node.#err_message = message;
+        return node;
+    }
+
+    get correct()
+    {
+        let flag = !this.#err_node;
+
+        if (this.lop != null)
+            flag &= this.lop.correct;
+        if (this.rop != null)
+            flag &= this.rop.correct;
+
+        return flag;
+    }
+
+    get errors()
+    {
+        let errors_list = [];
+        if (this.#err_node)
+            errors_list.push(this.#err_message);
+
+        if (this.lop != null)
+            errors_list = errors_list.concat(this.lop.errors);
+
+        if (this.rop != null)
+            errors_list = errors_list.concat(this.rop.errors);
+
+        return errors_list;
     }
 
     equals(other)
@@ -249,6 +288,10 @@ class Formula
             case Formula.Operator.R:
                 let res = `${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}${Formula.text_of(this.opc, latex, compact)}${this.rop.#to_string_internal(wrap_rop, latex, compact, definitions, announce)}`;
                 str += (wrap ? `(${res})` : res);
+                break;
+
+            case Formula.Operator.ERROR_NODE:
+                str += "<error_node>";
                 break;
 
             default:

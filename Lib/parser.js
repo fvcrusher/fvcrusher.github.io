@@ -1,7 +1,7 @@
 import Stream from "./stream.js";
 import Formula from "./formula.js";
 
-class Parser
+class OldParser
 {
     static #isSpace(str)
     {
@@ -33,7 +33,7 @@ class Parser
 
     #skip_empty()
     {
-        while (!this.#stream.end && Parser.#isSpace(this.#stream.current))
+        while (!this.#stream.end && OldParser.#isSpace(this.#stream.current))
             this.#stream.next();
     }
 
@@ -49,7 +49,7 @@ class Parser
     #parse_atom()
     {
         let end = 0;
-        while (!this.#stream.end_at(end) && Parser.#isAtomNameSymbol(this.#stream.at(end)))
+        while (!this.#stream.end_at(end) && OldParser.#isAtomNameSymbol(this.#stream.at(end)))
             end++;
 
         let name = this.#stream.slice(0, end);
@@ -128,7 +128,7 @@ class Parser
     }
 }
 
-class NewParser
+class Parser
 {
     static #isAtomSymbol(str)
     {
@@ -142,7 +142,7 @@ class NewParser
 
     #skip_empty()
     {
-        while (!this.#stream.end && NewParser.#isSpace(this.#stream.current))
+        while (!this.#stream.end && Parser.#isSpace(this.#stream.current))
             this.#stream.next();
     }
 
@@ -213,16 +213,48 @@ class NewParser
     GetAnd()
     {
         this.#skip_empty();
-        let lop = this.GetNot();
+        let lop = this.GetBinaryLtlOps();
         this.#skip_empty();
 
         while (this.#stream.current == "&")
         {
             this.#stream.next();
             this.#skip_empty();
-            let rop = this.GetNot();
+            let rop = this.GetBinaryLtlOps();
             this.#skip_empty();
             lop = Formula.binary(Formula.Operator.AND, lop, rop);
+            this.#skip_empty();
+        }
+
+        return lop;
+    }
+
+    GetBinaryLtlOps()
+    {
+        this.#skip_empty();
+        let lop = this.GetNot();
+        this.#skip_empty();
+
+        while (["U", "W", "R"].indexOf(this.#stream.current) != -1)
+        {
+            let op = this.#stream.current;
+            this.#stream.next();
+            this.#skip_empty();
+            let rop = this.GetNot();
+            this.#skip_empty();
+            switch (op)
+            {
+                case "U":
+                    lop = Formula.binary(Formula.Operator.U, lop, rop);
+                    break;
+                case "W":
+                    lop = Formula.binary(Formula.Operator.W, lop, rop);
+                    break;
+                case "R":
+                    lop = Formula.binary(Formula.Operator.R, lop, rop);
+                    break;
+            }
+            
             this.#skip_empty();
         }
 
@@ -241,12 +273,29 @@ class NewParser
             return Formula.unary(Formula.Operator.NOT, lop);
         }
         
-        return this.GetLtlOps();
+        return this.GetUnaryLtlOps();
     }
 
-    GetLtlOps()
+    GetUnaryLtlOps()
     {
         this.#skip_empty();
+        if (["X", "F", "G"].indexOf(this.#stream.current) != -1)
+        {
+            let op = this.#stream.current;
+            this.#stream.next();
+            this.#skip_empty();
+            let lop = this.GetNot();
+            this.#skip_empty();
+            switch (op)
+            {
+                case "X":
+                    return Formula.unary(Formula.Operator.X, lop);
+                case "F":
+                    return Formula.unary(Formula.Operator.F, lop);
+                case "G":
+                    return Formula.unary(Formula.Operator.G, lop);                    
+            }
+        }
 
         return this.GetSubExpression();
     }
@@ -260,6 +309,10 @@ class NewParser
             this.#skip_empty();
             let expression = this.GetImpl();
             this.#skip_empty();
+
+            if (this.#stream.current != ")")
+                return Formula.error(`Missing enclosing parenthesis at position ${this.#stream.current_idx}`);
+
             this.#stream.next();
             this.#skip_empty();
 
@@ -273,8 +326,11 @@ class NewParser
     {
         this.#skip_empty();
         let len = 0;
-        while (!this.#stream.end_at(len) && NewParser.#isAtomSymbol(this.#stream.at(len)))
+        while (!this.#stream.end_at(len) && Parser.#isAtomSymbol(this.#stream.at(len)))
             len++;
+
+        if (len == 0)
+            return Formula.error(`There is variable must be on position ${this.#stream.current_idx}`)
 
         let name = this.#stream.slice(0, len);
         this.#stream.move(len);
@@ -283,11 +339,11 @@ class NewParser
         {
             case "true":
             case "1":
-                return new Formula.true();
+                return Formula.true();
 
             case "false":
             case "0":
-                return new Formula.false();
+                return Formula.false();
 
             default:
                 return new Formula(name);
