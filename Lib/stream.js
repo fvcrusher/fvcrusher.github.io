@@ -12,6 +12,11 @@ class Stream
         this.#counter = 0;
     }
 
+    get current_idx()
+    {
+        return this.#counter;
+    }
+
     get current()
     {
         return this.#str[this.#counter];
