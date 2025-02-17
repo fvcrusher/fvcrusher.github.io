@@ -1,7 +1,19 @@
 class Stream
 {
+    #initial_str = null;
+    #initial_counter = null;
     #str = null;
     #counter = 0;
+
+    get initial_str()
+    {
+        return this.#initial_str;
+    }
+
+    get initial_counter()
+    {
+        return this.#initial_counter;
+    }
 
     get str()
     {
@@ -18,6 +30,7 @@ class Stream
         if (!(typeof str === "string"))
             throw new Error(`string expected, but ${typeof str} given`);
 
+        this.#initial_str = str;
         this.#str = str;
         this.#counter = 0;
     }
@@ -45,16 +58,26 @@ class Stream
     next()
     {
         this.#counter++;
+        this.#initial_counter++;
+        while (this.#initial_counter < this.#initial_str.length && this.#initial_str[this.#initial_counter].match(/\s/i))
+            this.#initial_counter++;
     }
 
     move(cnt)
     {
-        this.#counter += cnt;
+        for (let i = 0; i < cnt; i++)
+        {
+            this.#counter++;
+            this.#initial_counter++;
+            while (this.#initial_counter < this.#initial_str.length && this.#initial_str[this.#initial_counter].match(/\s/i))
+                this.#initial_counter++;
+        }
     }
 
     reset()
     {
         this.#counter = 0;
+        this.#initial_counter = 0;
     }
 
     get end()
@@ -72,7 +95,7 @@ class Stream
         this.#str = this.#str.replaceAll(/\s/gi, "");
     }
 
-    startswith() 
+    startswith()
     {
         for (let i = 0; i < arguments.length; i++)
         {
