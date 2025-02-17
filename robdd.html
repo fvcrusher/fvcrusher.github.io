@@ -291,7 +291,20 @@
         {
             const inputField = document.getElementById("expression");
             let errors = ROBDDBuilder.Solver.check_syntax(inputField.value);
-            console.log(errors);
+            let atoms = ROBDDBuilder.Solver.get_atoms(inputField.value)
+
+            if (errors.length == 0)
+            {
+                inputField.style.removeProperty("border-color");
+                inputField.style.removeProperty("border-width");
+                inputField.style.removeProperty("padding");
+            }
+            else
+            {
+                inputField.style.borderColor = "red";
+                inputField.style.borderWidth = "3px";
+                inputField.style.padding = "10px";
+            }
         }
         document.getElementById("expression").addEventListener("input", process_input_update);
     </script>
