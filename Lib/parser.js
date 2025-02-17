@@ -280,7 +280,7 @@ class Parser
             let expression = this.GetImpl();
 
             if (this.#stream.current != Parser.#getEnclosing(opening_bracket))
-                return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected enclosing bracket '${Parser.#getEnclosing(opening_bracket)}', but '${this.#stream.current}' found`);
+                return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected enclosing bracket '${Parser.#getEnclosing(opening_bracket)}', but '${this.#stream.current == undefined ? "End of line" : this.#stream.current}' found`);
 
             this.#stream.next();
             return expression;
@@ -296,7 +296,7 @@ class Parser
             len++;
 
         if (len == 0)
-            return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected variable, but '${this.#stream.current}' found`)
+            return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected variable, but '${this.#stream.current == undefined ? "End of line" : this.#stream.current}' found`)
 
         let name = this.#stream.slice(0, len);
         this.#stream.move(len);
