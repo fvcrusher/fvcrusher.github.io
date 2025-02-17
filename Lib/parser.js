@@ -132,18 +132,7 @@ class Parser
 {
     static #isAtomSymbol(str)
     {
-        return str.length === 1 && str.match(/[\w\d]/i);
-    }
-
-    static #isSpace(str)
-    {
-        return str.length === 1 && str.match(/\s/i);
-    }
-
-    #skip_empty()
-    {
-        while (!this.#stream.end && Parser.#isSpace(this.#stream.current))
-            this.#stream.next();
+        return str.length === 1 && str.match(/[a-zA-EH-QSTVYZ\d_]/);
     }
 
     #stream = null;
@@ -151,21 +140,18 @@ class Parser
     parse(formula)
     {
         this.#stream = new Stream(formula);
+        this.#stream.remove_spaces();
         return this.GetImpl();
     }
 
     GetImpl()
     {
-        this.#skip_empty();
         let lop = this.GetXor();
-        this.#skip_empty();
 
         while (!this.#stream.end_at(2) && this.#stream.slice(0, 2) == "->")
         {
             this.#stream.move(2);
-            this.#skip_empty();
             let rop = this.GetXor();
-            this.#skip_empty();
             lop = Formula.binary(Formula.Operator.IMPL, lop, rop);
         }
 
@@ -174,18 +160,13 @@ class Parser
 
     GetXor()
     {
-        this.#skip_empty();
         let lop = this.GetOr();
-        this.#skip_empty();
 
         while (this.#stream.current == "+")
         {
             this.#stream.next();
-            this.#skip_empty();
             let rop = this.GetOr();
-            this.#skip_empty();
             lop = Formula.binary(Formula.Operator.XOR, lop, rop);
-            this.#skip_empty();
         }
 
         return lop;
@@ -193,18 +174,13 @@ class Parser
 
     GetOr()
     {
-        this.#skip_empty();
         let lop = this.GetAnd();
-        this.#skip_empty();
 
         while (this.#stream.current == "|")
         {
             this.#stream.next();
-            this.#skip_empty();
             let rop = this.GetAnd();
-            this.#skip_empty();
             lop = Formula.binary(Formula.Operator.OR, lop, rop);
-            this.#skip_empty();
         }
 
         return lop;
@@ -212,18 +188,13 @@ class Parser
 
     GetAnd()
     {
-        this.#skip_empty();
         let lop = this.GetBinaryLtlOps();
-        this.#skip_empty();
 
         while (this.#stream.current == "&")
         {
             this.#stream.next();
-            this.#skip_empty();
             let rop = this.GetBinaryLtlOps();
-            this.#skip_empty();
             lop = Formula.binary(Formula.Operator.AND, lop, rop);
-            this.#skip_empty();
         }
 
         return lop;
@@ -231,17 +202,13 @@ class Parser
 
     GetBinaryLtlOps()
     {
-        this.#skip_empty();
         let lop = this.GetNot();
-        this.#skip_empty();
 
-        while (["U", "W", "R"].indexOf(this.#stream.current) != -1)
+        while (this.#stream.startswith("U", "W", "R"))
         {
             let op = this.#stream.current;
             this.#stream.next();
-            this.#skip_empty();
             let rop = this.GetNot();
-            this.#skip_empty();
             switch (op)
             {
                 case "U":
@@ -254,8 +221,6 @@ class Parser
                     lop = Formula.binary(Formula.Operator.R, lop, rop);
                     break;
             }
-            
-            this.#skip_empty();
         }
 
         return lop;
@@ -263,13 +228,10 @@ class Parser
 
     GetNot()
     {
-        this.#skip_empty();
-        if (this.#stream.current == "!")
+        if (this.#stream.startswith("!", "¬", "-"))
         {
             this.#stream.next();
-            this.#skip_empty();
             let lop = this.GetNot();
-            this.#skip_empty();
             return Formula.unary(Formula.Operator.NOT, lop);
         }
         
@@ -278,21 +240,20 @@ class Parser
 
     GetUnaryLtlOps()
     {
-        this.#skip_empty();
-        if (["X", "F", "G"].indexOf(this.#stream.current) != -1)
+        if (this.#stream.startswith("X", "F", "<>", "G", "[]"))
         {
-            let op = this.#stream.current;
-            this.#stream.next();
-            this.#skip_empty();
+            let op = this.#stream.slice(0, this.#stream.startswith("X", "F", "G") ? 1 : 2);
+            this.#stream.move(this.#stream.startswith("X", "F", "G") ? 1 : 2);
             let lop = this.GetNot();
-            this.#skip_empty();
             switch (op)
             {
                 case "X":
                     return Formula.unary(Formula.Operator.X, lop);
                 case "F":
+                case "<>":
                     return Formula.unary(Formula.Operator.F, lop);
                 case "G":
+                case "[]":
                     return Formula.unary(Formula.Operator.G, lop);                    
             }
         }
@@ -302,20 +263,15 @@ class Parser
 
     GetSubExpression()
     {
-        this.#skip_empty();
         if (this.#stream.current == "(")
         {
             this.#stream.next();
-            this.#skip_empty();
             let expression = this.GetImpl();
-            this.#skip_empty();
 
             if (this.#stream.current != ")")
-                return Formula.error(`Missing enclosing parenthesis at position ${this.#stream.current_idx}`);
+                return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected enclosing parenthesis, but '${this.#stream.current}' found`)
 
             this.#stream.next();
-            this.#skip_empty();
-
             return expression;
         }
         else 
@@ -324,13 +280,12 @@ class Parser
 
     GetAtom()
     {
-        this.#skip_empty();
         let len = 0;
         while (!this.#stream.end_at(len) && Parser.#isAtomSymbol(this.#stream.at(len)))
             len++;
 
         if (len == 0)
-            return Formula.error(`There is variable must be on position ${this.#stream.current_idx}`)
+            return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected variable, but '${this.#stream.current}' found`)
 
         let name = this.#stream.slice(0, len);
         this.#stream.move(len);

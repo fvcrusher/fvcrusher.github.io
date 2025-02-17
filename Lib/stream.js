@@ -3,6 +3,16 @@ class Stream
     #str = null;
     #counter = 0;
 
+    get str()
+    {
+        return this.#str;
+    }
+
+    get rest_of_str()
+    {
+        return this.#str.slice(this.#counter, this.#str.length);
+    }
+
     constructor(str)
     {
         if (!(typeof str === "string"))
@@ -57,9 +67,20 @@ class Stream
         return this.#counter + cnt >= this.#str.length;
     }
 
-    get left_str()
+    remove_spaces()
     {
-        return this.#str.slice(this.#counter, this.#str.length);
+        this.#str = this.#str.replaceAll(/\s/gi, "");
+    }
+
+    startswith() 
+    {
+        for (let i = 0; i < arguments.length; i++)
+        {
+            if (arguments[i] == this.slice(0, arguments[i].length))
+                return true;
+        }
+
+        return false;
     }
 }
 

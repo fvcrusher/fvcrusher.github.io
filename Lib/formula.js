@@ -120,8 +120,7 @@ class Formula
     opc = null;
     name = null;
 
-    #err_node = false;
-    #err_message = null;
+    #error_info = null;
 
     constructor(operator)
     {
@@ -161,17 +160,16 @@ class Formula
         return node;
     }
 
-    static error(message)
+    static error(formula_string, position, message)
     {
         let node = new Formula(Formula.Operator.ERROR_NODE);
-        node.#err_node = true;
-        node.#err_message = message;
+        node.#error_info = {string: formula_string, index: position, message: message};
         return node;
     }
 
     get correct()
     {
-        let flag = !this.#err_node;
+        let flag = this.opc != Formula.Operator.ERROR_NODE;
 
         if (this.lop != null)
             flag &= this.lop.correct;
@@ -184,8 +182,8 @@ class Formula
     get errors()
     {
         let errors_list = [];
-        if (this.#err_node)
-            errors_list.push(this.#err_message);
+        if (this.opc == Formula.Operator.ERROR_NODE)
+            errors_list.push(this.#error_info);
 
         if (this.lop != null)
             errors_list = errors_list.concat(this.lop.errors);
