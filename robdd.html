@@ -287,13 +287,13 @@
             source_button.style.cursor = "default";
         }
 
-        function update_var_list()
+        function process_input_update()
         {
             const inputField = document.getElementById("expression");
-            //console.log(ROBDDBuilder.Solver.get_atoms(inputField.value).map(atom => atom.string));
-            console.log("Auto-updating atoms is not working yet");
+            let errors = ROBDDBuilder.Solver.check_syntax(inputField.value);
+            console.log(errors);
         }
-        document.getElementById("expression").addEventListener("input", update_var_list);
+        document.getElementById("expression").addEventListener("input", process_input_update);
     </script>
 </body>
 </html>

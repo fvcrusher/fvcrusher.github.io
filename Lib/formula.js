@@ -160,10 +160,10 @@ class Formula
         return node;
     }
 
-    static error(formula_string, position, message)
+    static error(formula_string, position, expected, found, message=null)
     {
         let node = new Formula(Formula.Operator.ERROR_NODE);
-        node.#error_info = {string: formula_string, index: position, message: message};
+        node.#error_info = {string: formula_string, index: position, expected: expected, found: found, message: message};
         return node;
     }
 

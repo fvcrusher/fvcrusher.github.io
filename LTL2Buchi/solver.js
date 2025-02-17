@@ -829,6 +829,19 @@ export class Solver
         this.#build_acceptable_states();
         this.#build_edges();
     }
+
+    static check_syntax(ltl)
+    {
+        let parser = new Parser();
+        let parsed_ltl = null;
+
+        if (typeof ltl === "string")
+            parsed_ltl = parser.parse(ltl);
+        else if (ltl instanceof Formula)
+            parsed_ltl = Formula.copy(ltl);
+
+        return parsed_ltl.errors;
+    }
 }
 
 // let solver = new Solver();
