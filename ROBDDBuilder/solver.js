@@ -4,6 +4,18 @@ import TreeNode from "../Lib/tree.js";
 
 export class Solver
 {
+    #errors = null;
+
+    get incorrect()
+    {
+        return this.#errors != null;
+    }
+
+    get errors()
+    {
+        return this.#errors;
+    }
+
     #initial_formula = null;
     #atoms_order = null;
     #known_branches = [];
@@ -270,6 +282,12 @@ export class Solver
             this.#initial_formula = Formula.copy(formula);
         else
             return;
+
+        if (!this.#initial_formula.correct)
+        {
+            this.#errors = this.#initial_formula.errors;
+            return;
+        }
 
         console.log(`Building ROBDD graph for ${this.#initial_formula.string}`);
 

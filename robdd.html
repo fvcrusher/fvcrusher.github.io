@@ -197,6 +197,16 @@
 
             clear_output(outputDiv);
 
+            if (solver.incorrect)
+            {
+                add_paragraph(outputDiv, "Некорректный синтаксис формулы");
+                for (let i = 0; i < solver.errors.length; i++)
+                    add_paragraph(outputDiv, `In ${solver.errors[i].string} at index ${solver.errors[i].index}: ${solver.errors[i].message}`);
+
+                outputDiv.style.display = "block";
+                return;
+            }
+
             add_paragraph(outputDiv, `Построим граф ROBDD для выражения \$${solver.initial_formula.compact_latex}\$. Для этого будем подставлять значения переменных (\$1\$ или \$0\$) согласно указанному порядку переменных: \$${solver.atoms_order.map(atom => atom.compact_latex).join(" \\prec ")}\$. В случае, если будет получено выражение, уже полученное в другой ветке перебора, в графе ROBDD будем ссылаться на уже существующий узел.`);
 
             let solution = document.createElement("div");

@@ -4,6 +4,18 @@ import TreeNode from "../Lib/tree.js";
 
 export class Solver
 {
+    #errors = null;
+
+    get incorrect()
+    {
+        return this.#errors != null;
+    }
+
+    get errors()
+    {
+        return this.#errors;
+    }
+
     #initial_ltl = null;
     transformation_steps = [];
 
@@ -787,6 +799,12 @@ export class Solver
         }
         else
             return;
+
+        if (!this.#initial_ltl.correct)
+        {
+            this.#errors = this.#initial_ltl.errors;
+            return;
+        }
 
         this.#transform();
         let i = 0;
