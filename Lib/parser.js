@@ -261,15 +261,26 @@ class Parser
         return this.GetSubExpression();
     }
 
+    static #getEnclosing(bracket)
+    {
+        switch (bracket)
+        {
+            case "(": return ")";
+            case "[": return "]";
+            case "{": return "}";
+        }
+    }
+
     GetSubExpression()
     {
-        if (this.#stream.current == "(")
+        if (this.#stream.startswith("(", "[", "{"))
         {
+            let opening_bracket = this.#stream.current;
             this.#stream.next();
             let expression = this.GetImpl();
 
-            if (this.#stream.current != ")")
-                return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected enclosing parenthesis, but '${this.#stream.current}' found`)
+            if (this.#stream.current != Parser.#getEnclosing(opening_bracket))
+                return Formula.error(this.#stream.str, this.#stream.current_idx, `Expected enclosing bracket '${Parser.#getEnclosing(opening_bracket)}', but '${this.#stream.current}' found`);
 
             this.#stream.next();
             return expression;
