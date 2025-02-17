@@ -169,6 +169,7 @@ input[type="text"] {
     text-align: left;
     display: flex;
     transition: 0.3s;
+    min-width: max-content;
 }
 
 .line-number {
@@ -458,6 +459,7 @@ input:checked + .slider:before {
 
 .switch-container {
     width: fit-content;
+    min-width: max-content;
 }
 
 .robdd-settings {
