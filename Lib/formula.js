@@ -85,11 +85,15 @@ class Formula
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
+            case Formula.Operator.XOR:
             case Formula.Operator.IMPL:
             case Formula.Operator.U:
             case Formula.Operator.W:
             case Formula.Operator.R:
                 return Formula.binary(other.opc, Formula.copy(other.lop), Formula.copy(other.rop));
+
+            case Formula.Operator.ERROR_NODE:
+                return Formula.error(other.#error_info.string, other.#error_info.index, other.#error_info.expected, other.#error_info.found, other.#error_info.message);
         }
 
         return null;
