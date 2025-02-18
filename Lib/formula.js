@@ -231,7 +231,7 @@ class Formula
         )
     }
 
-    #to_string_internal(wrap=false, latex=false, compact=false, definitions=[], announce=[])
+    #to_string_internal(wrap=false, latex=false, compact=false, compact_not=false, definitions=[], announce=[])
     {
         let str = "";
 
@@ -270,7 +270,7 @@ class Formula
                 break;
 
             case Formula.Operator.NOT:
-                if (compact)
+                if (compact_not || compact)
                 {
                     str += `\\overline{${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}}`;
                     break;
@@ -308,27 +308,32 @@ class Formula
 
     get string()
     {
-        return this.#to_string_internal(false, false, false);
+        return this.#to_string_internal(false, false, false, false);
     }
 
     def_string(definitions, announce=[])
     {
-        return this.#to_string_internal(false, false, false, definitions, announce);
+        return this.#to_string_internal(false, false, false, false, definitions, announce);
     }
 
     get latex()
     {
-        return this.#to_string_internal(false, true, false);
+        return this.#to_string_internal(false, true, false, false);
     }
 
     def_latex(definitions, announce=[])
     {
-        return this.#to_string_internal(false, true, false, definitions, announce);
+        return this.#to_string_internal(false, true, false, false, definitions, announce);
     }
 
     get compact_latex()
     {
-        return this.#to_string_internal(false, true, true);
+        return this.#to_string_internal(false, true, true, true);
+    }
+
+    get cnf_latex()
+    {
+        return this.#to_string_internal(false, true, false, true)
     }
 
     get variables()

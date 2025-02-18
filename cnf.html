@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
+    <link type="Image/x-icon" href="favicon.ico" rel="icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FVCrusher · CNF</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        let CNFBuilder = null;
+        import("./CNF/solver.js").then((mod) => CNFBuilder = mod);
+    </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            jax: ["input/TeX", "output/HTML-CSS"],
+            extensions: ["tex2jax.js"],
+            "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] },
+            tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+            TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
+            messageStyle: "none"
+        });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div>
+                <button class="home-button" onclick="location.href='/'">FVCrusher</button>
+            </div>
+            <div>
+                <button class="header-button" onclick="toggleNavigation()">
+                    Навигация ☰
+                </button>
+            </div>
+            <script>
+                function toggleNavigation()
+                {
+                    let nav_panel = document.getElementById("nav-panel");
+                    if (nav_panel.style.height == "0px")
+                    {
+                        let is_row = window.getComputedStyle(document.getElementById("nav-panel")).flexDirection == "row";
+                        nav_panel.style.height = `${nav_panel.scrollHeight * (is_row ? 2 : 1)}px`;
+                        nav_panel.style.paddingTop = "10px";
+                    }
+                        
+                    else
+                    {
+                        nav_panel.style.height = "0px";
+                        nav_panel.style.paddingTop = "0px";
+                    }
+                }
+            </script>
+        </div>
+        <div class="nav-panel" id="nav-panel" style="height: 0px;">
+            <button class="nav-button inactive" onclick="window.alert('Данный функционал еще не реализован')">КНФ</button>
+            <button class="nav-button inactive" onclick="window.alert('Данный функционал еще не реализован')">Нельсон-Оппен</button>
+            <button class="nav-button" onclick="location.href='/ltl2buchi'">LTL → Бюхи</button>
+            <button class="nav-button" onclick="location.href='/robdd'">ROBDD</button>
+            <button class="nav-button inactive" onclick="window.alert('Данный функционал еще не реализован')">База знаний</button>
+        </div>
+    </header>
+    <main>
+        <div class="form-container">
+            <input type="text" id="expression" placeholder="Введите логическое выражение...">
+            <button class="solve-button" onclick="run_solver()">Решить</button>
+        </div>
+        <div id="output" class="output">
+            <p class="warning">
+                <span>&#9888;</span> Данное решение не является истиной в 
+                последней инстанции, настоятельно рекомендуется при использовании 
+                проверять корректность. В случае обнаружения ошибок в решении 
+                рекомендуется завести issue в репозитории проекта
+            </p>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-text">2025</div>
+            <div>
+                <button onclick="location.href='https://github.com/fvcrusher/fvcrusher.github.io'" class="footer-link">
+                    <svg class="logo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"></path>
+                    </svg>
+                    <span class="footer-link-text">Исходники на GitHub</span>
+                </button>
+            </div>
+            <div>
+                <button onclick="location.href='https://t.me/ebasoft'" class="footer-link">
+                    <svg class="logo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"></path>
+                    </svg>
+                    <span class="footer-link-text">Пацанская прога</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+    <script>
+
+        function clear_output(container) {
+            let to_remove = container.getElementsByClassName("generated-output");
+            while (to_remove.length > 0)
+                container.removeChild(to_remove[0]);
+        }
+
+        function add_paragraph(container, text, latex=false, warning=false, class_list = null) {
+            let par = document.createElement("p");
+            par.classList.add("generated-output");
+            if (latex)
+                par.classList.add("latex-string");
+            if (warning)
+                par.classList.add("warning");
+            if (class_list != null)
+            {
+                for (let i = 0; i < class_list.length; i++)
+                    par.classList.add(class_list[i]);
+            }
+            if (typeof text === "string")
+            {
+                let txt = document.createTextNode(text);
+                par.appendChild(txt);
+            }
+            else
+                par.appendChild(text);
+            container.appendChild(par);
+
+            return par;
+        }
+
+        function run_solver() {
+            const inputField = document.getElementById("expression");
+            const outputDiv = document.getElementById("output");
+
+            let solver = new CNFBuilder.Solver();
+            solver.solve(inputField.value);
+
+            clear_output(outputDiv);
+
+            add_paragraph(outputDiv, `Преобразуем изначальное выражение \$${solver.initial_formula.cnf_latex}\$ в конъюнктивную нормальную форму (КНФ). Для этого начиная с наиболее глубоко вложенных подвыражений будем производить замены.`);
+
+            for (let i = 0; i < solver.solution_steps.length; i++)
+            {
+                let step = solver.solution_steps[i];
+                add_paragraph(outputDiv, `Замена \$${step.replacement.cnf_latex} = ${step.initial_operation.cnf_latex}\$; КНФ: \$${step.cnf_part.cnf_latex}\$`);
+            }
+
+            add_paragraph(outputDiv, `Итоговая КНФ - это комбинация всех частей КНФ полученных на этапах замены и последней введенной переменной. Классическая запись: ${solver.cnf_latex}`);
+            add_paragraph(outputDiv, `Компактный формат записи: ${solver.cnf_parts_latex}`);
+
+            outputDiv.style.display = "block";
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        }
+
+        function process_input_update()
+        {
+            const inputField = document.getElementById("expression");
+            let errors = CNFBuilder.Solver.check_syntax(inputField.value);
+
+            if (errors.length == 0)
+            {
+                inputField.style.removeProperty("border-color");
+                inputField.style.removeProperty("border-width");
+                inputField.style.removeProperty("padding");
+            }
+            else
+            {
+                inputField.style.borderColor = "red";
+                inputField.style.borderWidth = "3px";
+                inputField.style.padding = "10px";
+            }
+        }
+        document.getElementById("expression").addEventListener("input", process_input_update);
+    </script>
+</body>
+</html>
