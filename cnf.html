@@ -131,6 +131,45 @@
             return par;
         }
 
+        function draw_table(parent, solution) {
+            let table = document.createElement("table");
+            table.classList.add("tg", "generated-output");
+            parent.appendChild(table);
+
+            let header = document.createElement("thead");
+            let body = document.createElement("tbody");
+            table.appendChild(header);
+            table.appendChild(body);
+
+            let tr = document.createElement("tr");
+            header.appendChild(tr);
+            
+            const col_names = ["Шаг", "Замена", "КНФ подвыражения"];
+            for (let i = 0; i < col_names.length; i++)
+            {
+                let cell = document.createElement("th");
+                cell.classList.add("tg-1pky");
+                cell.appendChild(document.createTextNode(col_names[i]));
+                tr.appendChild(cell);
+            }
+
+            for (let line = 0; line < solution.length; line++)
+            {
+                tr = document.createElement("tr");
+                body.appendChild(tr);
+
+                let step = solution[line];
+                let col_values = [`${line + 1}`, `\$${step.replacement.cnf_latex} = ${step.initial_operation.cnf_latex}\$`, `\$${step.cnf_part.cnf_latex}\$`];
+                for (let i = 0; i < col_values.length; i++)
+                {
+                    let cell = document.createElement("td");
+                    cell.classList.add(i == 0 ? "tg-1pky" : "tg-0pky");
+                    cell.appendChild(document.createTextNode(col_values[i]));
+                    tr.appendChild(cell);
+                }
+            }
+        }
+
         function run_solver() {
             const inputField = document.getElementById("expression");
             const outputDiv = document.getElementById("output");
@@ -142,11 +181,12 @@
 
             add_paragraph(outputDiv, `Преобразуем изначальное выражение \$${solver.initial_formula.cnf_latex}\$ в конъюнктивную нормальную форму (КНФ). Для этого начиная с наиболее глубоко вложенных подвыражений будем производить замены.`);
 
-            for (let i = 0; i < solver.solution_steps.length; i++)
-            {
-                let step = solver.solution_steps[i];
-                add_paragraph(outputDiv, `Замена \$${step.replacement.cnf_latex} = ${step.initial_operation.cnf_latex}\$; КНФ: \$${step.cnf_part.cnf_latex}\$`);
-            }
+            draw_table(outputDiv, solver.solution_steps);
+            // for (let i = 0; i < solver.solution_steps.length; i++)
+            // {
+            //     let step = solver.solution_steps[i];
+            //     add_paragraph(outputDiv, `Замена \$${step.replacement.cnf_latex} = ${step.initial_operation.cnf_latex}\$; КНФ: \$${step.cnf_part.cnf_latex}\$`);
+            // }
 
             add_paragraph(outputDiv, `Итоговая КНФ - это комбинация всех частей КНФ полученных на этапах замены и последней введенной переменной. Классическая запись: ${solver.cnf_latex}`);
             add_paragraph(outputDiv, `Компактный формат записи: ${solver.cnf_parts_latex}`);
