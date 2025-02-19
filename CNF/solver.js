@@ -92,12 +92,32 @@ export class Solver
         return Solver.#replacements[this.#current_replacement_idx++];
     }
 
+    #fold_duplicated_not(formula)
+    {
+        if (formula != null && formula.opc == Formula.Operator.NOT &&
+            formula.lop != null && formula.lop.opc == Formula.Operator.NOT)
+        {
+            formula.emplace(formula.lop.lop);
+            this.#fold_duplicated_not(formula);
+        }
+
+        else
+        {
+            if (formula.lop != null)
+                this.#fold_duplicated_not(formula.lop);
+            if (formula.rop != null)
+                this.#fold_duplicated_not(formula.rop);
+        }
+    }
+
     #get_cnf_part(opc, lop, rop, replacement)
     {
+        let cnf_part = null;
+
         switch (opc)
         {
             case Formula.Operator.AND:
-                return Formula.binary(Formula.Operator.AND, 
+                cnf_part = Formula.binary(Formula.Operator.AND, 
                     Formula.binary(Formula.Operator.OR, 
                         Formula.binary(Formula.Operator.OR,
                             Formula.unary(Formula.Operator.NOT, lop),
@@ -114,8 +134,9 @@ export class Solver
                         )
                     )
                 );
+                break;
             case Formula.Operator.OR:
-                return Formula.binary(Formula.Operator.AND, 
+                cnf_part = Formula.binary(Formula.Operator.AND, 
                     Formula.binary(Formula.Operator.OR, 
                         Formula.binary(Formula.Operator.OR,
                             lop, rop
@@ -131,8 +152,9 @@ export class Solver
                         )
                     )
                 );
+                break;
             case Formula.Operator.XOR:
-                return Formula.binary(Formula.Operator.AND, 
+                cnf_part = Formula.binary(Formula.Operator.AND, 
                     Formula.binary(Formula.Operator.OR, 
                         Formula.binary(Formula.Operator.OR,
                             Formula.unary(Formula.Operator.NOT, lop), 
@@ -163,8 +185,9 @@ export class Solver
                         )
                     )
                 );
+                break;
             case Formula.Operator.IMPL:
-                return Formula.binary(Formula.Operator.AND, 
+                cnf_part = Formula.binary(Formula.Operator.AND, 
                     Formula.binary(Formula.Operator.OR, 
                         Formula.binary(Formula.Operator.OR,
                             Formula.unary(Formula.Operator.NOT, lop), rop
@@ -179,10 +202,13 @@ export class Solver
                             Formula.unary(Formula.Operator.NOT, rop), replacement,
                         )
                     )
-                )
-            default:
-                return null;
+                );
+                break;
         }
+
+        this.#fold_duplicated_not(cnf_part);
+
+        return cnf_part;
     }
 
     solve(formula)
