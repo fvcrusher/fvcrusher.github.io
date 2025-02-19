@@ -64,6 +64,70 @@
     </header>
     <main>
         <div class="form-container">
+
+            <button id="faqButton" class="faq-button" onclick="open_solver_reference()">
+                Справка по солверу
+                <div id="faqDropdown" class="dropdown-arrow">▼</div>
+            </button>
+            <script>
+                function open_solver_reference() {
+                    const faqText = document.getElementById("faqText");
+                    const faqButton = document.getElementById("faqButton");
+                    const arrow = document.getElementById("faqDropdown");
+                    const isOpen = faqText.classList.toggle("open");
+                    arrow.classList.toggle("up");
+                };
+            </script>
+            <div id="faqText" class="faq-text">
+                <p class="faq-par">Данный солвер преобразует формулу логики линейного времени в автомат Бюхи. Решение выдается в требуемом для курса формате.</p>
+                <p class="faq-par">Поддерживаемые операторы приведены в таблице ниже в порядке возрастания приоритета.</p>
+                <table class="tg">
+                    <thead>
+                        <tr>
+                            <th class="tg-0bld">Тип</th>
+                            <th class="tg-1bld" colspan="5">Классическая логика</th>
+                            <th class="tg-1bld" colspan="8">Операторы логики линейного времени</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tg-0bld">Оператор</td>
+                            <td class="tg-1pky">Импликация</td>
+                            <td class="tg-1pky">Исключающее ИЛИ</td>
+                            <td class="tg-1pky">Дизъюнкция</td>
+                            <td class="tg-1pky">Конъюнкция</td>
+                            <td class="tg-1pky">Отрицание</td>
+                            <td class="tg-1pky">Next</td>
+                            <td class="tg-1pky" colspan="2">Future</td>
+                            <td class="tg-1pky" colspan="2">Globally</td>
+                            <td class="tg-1pky">Until</td>
+                            <td class="tg-1pky">Weak until</td>
+                            <td class="tg-1pky">Release</td>
+                        </tr>
+                        <tr>
+                            <td class="tg-0bld">Запись</td>
+                            <td class="tg-1pky"><span class="code-cell">-&gt;</span></td>
+                            <td class="tg-1pky"><span class="code-cell">+</span></td>
+                            <td class="tg-1pky"><span class="code-cell">|</span></td>
+                            <td class="tg-1pky"><span class="code-cell">&amp;</span></td>
+                            <td class="tg-1pky"><span class="code-cell">!</span></td>
+                            <td class="tg-1pky"><span class="code-cell">X</span></td>
+                            <td class="tg-1pky"><span class="code-cell">F</span></td>
+                            <td class="tg-1pky"><span class="code-cell">&lt;&gt;</span></td>
+                            <td class="tg-1pky"><span class="code-cell">G</span></td>
+                            <td class="tg-1pky"><span class="code-cell">[]</span></td>
+                            <td class="tg-1pky"><span class="code-cell">U</span></td>
+                            <td class="tg-1pky"><span class="code-cell">W</span></td>
+                            <td class="tg-1pky"><span class="code-cell">R</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="faq-par">В качестве имени переменной можно использовать любую комбинацию латинских букв и цифр, за исключением букв, обозначающих операторы LTL.</p>
+                <p class="faq-par">Можно использовать любые скобки в выражении - фигурные, квадратные и круглые. Выражения в скобках вычисляются с наивысшим приоритетом.</p>
+                <p class="faq-par">Пример формулы: <span class="code-cell">G{q -> (!p & X(!q U p))}</span> или <span class="code-cell">[][q -> [!p & X[!q U p]]]</span>.</p>
+                <p class="faq-par">Формат решения можно настроить с помощью переключателей под полем ввода выражения: Компактный вид таблицы - компактизирует запись множеств истинности; Инвертировать порядок перебора - порядок перебора истинности для атомов будет инвертирован.</p>
+            </div>
+
             <input type="text" id="textInput" placeholder="Введите LTL...">
             <div class="ltl2buchi-settings">
                 <div class="switch-container">

@@ -66,6 +66,50 @@
     </header>
     <main>
         <div class="form-container">
+
+            <button id="faqButton" class="faq-button" onclick="open_solver_reference()">
+                Справка по солверу
+                <div id="faqDropdown" class="dropdown-arrow">▼</div>
+            </button>
+            <script>
+                function open_solver_reference() {
+                    const faqText = document.getElementById("faqText");
+                    const faqButton = document.getElementById("faqButton");
+                    const arrow = document.getElementById("faqDropdown");
+                    const isOpen = faqText.classList.toggle("open");
+                    arrow.classList.toggle("up");
+                };
+            </script>
+            <div id="faqText" class="faq-text">
+                <p class="faq-par">Данный солвер строит граф ROBDD по логическому выражению. Решение выдается в требуемом для курса формате.</p>
+                <p class="faq-par">Поддерживаемые операторы приведены в таблице ниже в порядке возрастания приоритета.</p>
+                <table class="tg">
+                    <tbody>
+                        <tr>
+                            <td class="tg-0bld">Оператор</td>
+                            <td class="tg-1pky">Импликация</td>
+                            <td class="tg-1pky">Исключающее ИЛИ</td>
+                            <td class="tg-1pky">Дизъюнкция</td>
+                            <td class="tg-1pky">Конъюнкция</td>
+                            <td class="tg-1pky">Отрицание</td>
+                        </tr>
+                        <tr>
+                            <td class="tg-0bld">Запись</td>
+                            <td class="tg-1pky"><span class="code-cell">-&gt;</span></td>
+                            <td class="tg-1pky"><span class="code-cell">+</span></td>
+                            <td class="tg-1pky"><span class="code-cell">|</span></td>
+                            <td class="tg-1pky"><span class="code-cell">&amp;</span></td>
+                            <td class="tg-1pky"><span class="code-cell">!</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="faq-par">В качестве имени переменной можно использовать любую комбинацию латинских букв и цифр, за исключением букв <span class="code-cell">X, F, G, U, W, R</span>.</p>
+                <p class="faq-par">Можно использовать любые скобки в выражении - фигурные, квадратные и круглые. Выражения в скобках вычисляются с наивысшим приоритетом.</p>
+                <p class="faq-par">Пример формулы: <span class="code-cell">(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))</span>.</p>
+                <p class="faq-par">Для построения ROBDD необходимо указать порядок переменных, по которому будет производится подстановка значений. В случае, если порядок не указан, им будет порядок появления переменных в формуле.</p>
+                <p class="faq-par">В случае, если в условии формула задана косвенно (например: трехбитное сложение <span class="code-cell">(x2 x1 x0) + (y2 y1 y0)</span>), то булеву формулу для него можно взять из выпадающего списка в окне ввода формулы.</p>
+            </div>
+
             <input type="text" id="expression" placeholder="Введите логическое выражение...">
             <input type="text" id="atomsOrder" placeholder="Введите порядок переменных (через пробел)...">
             <button class="solve-button" onclick="run_solver()">Решить</button>

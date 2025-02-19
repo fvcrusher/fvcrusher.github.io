@@ -270,6 +270,27 @@ footer p {
     vertical-align: center;
 }
 
+.tg .tg-0bld {
+    border-color: inherit;
+    text-align: left;
+    vertical-align: center;
+    font-weight: bold;
+}
+
+.tg .tg-1bld {
+    border-color: inherit;
+    text-align: center;
+    vertical-align: center;
+    font-weight: bold;
+}
+
+.code-cell {
+    background-color: lightgray;
+    padding: 0px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
 [type="checkbox"]
 {
     vertical-align:middle;
@@ -469,4 +490,45 @@ input:checked + .slider:before {
 .ltl2buchi-settings {
     display: flex;
     flex-direction: column;
+}
+
+button.faq-button {
+    margin-bottom: 12px;
+    background-color: transparent;
+    text-align: left;
+    display: flex;
+    padding: 0px;
+    justify-content: right;
+}
+
+.dropdown-arrow {
+    transition: all 0.3s ease-in-out;
+    max-width: min-content;
+    margin-left: 10px;
+}
+
+.dropdown-arrow.up {
+    transform: rotate(0.5turn) translateY(-3px);
+}
+
+.faq-text {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, margin-bottom 0.3s ease-in-out, padding-top 0.3s ease-in-out, padding-bottom 0.3s;
+    margin-bottom: 0px;
+    background-color: #ededed;
+    border-radius: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.faq-text.open {
+    max-height: 600px; /* Достаточно большое значение */
+    margin-bottom: 12px;
+    padding: 10px;
+}
+
+p.faq-par {
+    margin: 5px 0px;
+    text-align: left;
 }
