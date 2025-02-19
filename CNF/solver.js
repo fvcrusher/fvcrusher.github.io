@@ -3,6 +3,18 @@ import Parser from "../Lib/parser.js";
 
 export class Solver
 {
+    #errors = null;
+
+    get incorrect()
+    {
+        return this.#errors != null;
+    }
+
+    get errors()
+    {
+        return this.#errors;
+    }
+
     #initial_formula = null;
     #current_replacement_idx = 0;
 
@@ -222,9 +234,10 @@ export class Solver
         else
             return;
 
-        if (!this.#initial_formula.correct)
+        let errors_list = Solver.check_syntax(this.#initial_formula)
+        if (errors_list.length != 0)
         {
-            console.log(this.#initial_formula.errors);
+            this.#errors = errors_list;
             return;
         }
 
@@ -280,7 +293,12 @@ export class Solver
         else if (ltl instanceof Formula)
             parsed_ltl = Formula.copy(ltl);
 
-        return parsed_ltl.errors;
+        let errors = parsed_ltl.errors;
+
+        if (!parsed_ltl.contains_only(Formula.BooleanOperators))
+            errors.push({string: ltl, index: -1, expected: "", found: "", message: "Formula must contain only classic boolean operators"})
+
+        return errors;
     }
 }
 

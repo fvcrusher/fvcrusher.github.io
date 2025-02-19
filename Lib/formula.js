@@ -117,7 +117,29 @@ class Formula
             R: 13,
             ERROR_NODE: -1
         }
-    )
+    );
+
+    static BooleanOperators = [
+        Formula.Operator.AND,
+        Formula.Operator.OR,
+        Formula.Operator.XOR,
+        Formula.Operator.IMPL,
+        Formula.Operator.NOT
+    ];
+
+    static LTLOperators = [
+        Formula.Operator.AND,
+        Formula.Operator.OR,
+        Formula.Operator.XOR,
+        Formula.Operator.IMPL,
+        Formula.Operator.NOT,
+        Formula.Operator.X,
+        Formula.Operator.F,
+        Formula.Operator.G,
+        Formula.Operator.U,
+        Formula.Operator.W,
+        Formula.Operator.R
+    ]
 
     lop = null;
     rop = null;
@@ -366,6 +388,59 @@ class Formula
             variables.push(Formula.copy(this))
 
         return variables;
+    }
+
+    static #is_operator(opc)
+    {
+        return (
+            opc == Formula.Operator.NOT ||
+            opc == Formula.Operator.X ||
+            opc == Formula.Operator.F ||
+            opc == Formula.Operator.G ||
+            opc == Formula.Operator.AND ||
+            opc == Formula.Operator.OR ||
+            opc == Formula.Operator.XOR ||
+            opc == Formula.Operator.IMPL ||
+            opc == Formula.Operator.U ||
+            opc == Formula.Operator.W ||
+            opc == Formula.Operator.R
+        );
+    }
+
+    get operators_list()
+    {
+        let operators = [];
+
+        if (this.lop != null)
+            operators = this.lop.operators_list;
+
+        if (this.rop != null)
+        {
+            let rop_operators = this.rop.operators_list;
+            for (let i = 0; i < rop_operators.length; i++)
+            {
+                if (!operators.some((operator) => operator == rop_operators[i]))
+                    operators.push(rop_operators[i]);
+            }
+        }
+
+        if (Formula.#is_operator(this.opc) && !operators.some((operator) => operator == this.opc))
+            operators.push(this.opc)
+
+        return operators;
+    }
+
+    contains_only(allowed_operators_list)
+    {
+        let formula_operators_list = this.operators_list;
+        
+        for (let i = 0; i < formula_operators_list.length; i++)
+        {
+            if (allowed_operators_list.indexOf(formula_operators_list[i]) == -1)
+                return false;
+        }
+
+        return true;
     }
 }
 

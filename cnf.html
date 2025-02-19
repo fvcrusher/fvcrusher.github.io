@@ -179,6 +179,16 @@
 
             clear_output(outputDiv);
 
+            if (solver.incorrect)
+            {
+                add_paragraph(outputDiv, "Некорректный синтаксис формулы");
+                for (let i = 0; i < solver.errors.length; i++)
+                    add_paragraph(outputDiv, `In ${solver.errors[i].string} at index ${solver.errors[i].index}: ${solver.errors[i].message}`);
+
+                outputDiv.style.display = "block";
+                return;
+            }
+
             add_paragraph(outputDiv, `Преобразуем изначальное выражение \$${solver.initial_formula.cnf_latex}\$ в конъюнктивную нормальную форму (КНФ). Для этого начиная с наиболее глубоко вложенных подвыражений будем производить замены.`);
 
             draw_table(outputDiv, solver.solution_steps);
