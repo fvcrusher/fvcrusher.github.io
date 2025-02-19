@@ -205,18 +205,30 @@ export class Solver
         this.replace_binary_operation(Formula.copy(this.#initial_formula));
     }
 
+    #is_atom_or_reversed_atom(formula)
+    {
+        return (
+            formula.opc == Formula.Operator.ATOM ||
+            (
+                formula.opc == Formula.Operator.NOT &&
+                formula.lop != null &&
+                formula.lop.opc == Formula.Operator.ATOM
+            )
+        );
+    }
+
     replace_binary_operation(formula)
     {
-        if (formula.lop != null && formula.lop.opc != Formula.Operator.ATOM)
+        if (formula.lop != null && !this.#is_atom_or_reversed_atom(formula.lop))
             this.replace_binary_operation(formula.lop);
 
-        if (formula.rop != null && formula.rop.opc != Formula.Operator.ATOM)
+        if (formula.rop != null && !this.#is_atom_or_reversed_atom(formula.rop))
             this.replace_binary_operation(formula.rop);
 
         if (
             formula.lop != null && formula.rop != null && 
-            formula.lop.opc == Formula.Operator.ATOM &&
-            formula.rop.opc == Formula.Operator.ATOM
+            this.#is_atom_or_reversed_atom(formula.lop) &&
+            this.#is_atom_or_reversed_atom(formula.rop)
         )
         {
             let binary_operation = Formula.copy(formula);
