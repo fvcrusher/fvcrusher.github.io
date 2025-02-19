@@ -272,13 +272,13 @@ class Formula
             case Formula.Operator.NOT:
                 if (compact_not || compact)
                 {
-                    str += `\\overline{${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}}`;
+                    str += `\\overline{${this.lop.#to_string_internal(wrap_lop, latex, compact, compact_not, definitions, announce)}}`;
                     break;
                 }
             case Formula.Operator.X:
             case Formula.Operator.F:
             case Formula.Operator.G:
-                str += `${Formula.text_of(this.opc, latex, compact)}${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}`;
+                str += `${Formula.text_of(this.opc, latex, compact)}${this.lop.#to_string_internal(wrap_lop, latex, compact, compact_not, definitions, announce)}`;
                 break;
 
             case Formula.Operator.AND:
@@ -288,7 +288,7 @@ class Formula
             case Formula.Operator.U:
             case Formula.Operator.W:
             case Formula.Operator.R:
-                let res = `${this.lop.#to_string_internal(wrap_lop, latex, compact, definitions, announce)}${Formula.text_of(this.opc, latex, compact)}${this.rop.#to_string_internal(wrap_rop, latex, compact, definitions, announce)}`;
+                let res = `${this.lop.#to_string_internal(wrap_lop, latex, compact, compact_not, definitions, announce)}${Formula.text_of(this.opc, latex, compact)}${this.rop.#to_string_internal(wrap_rop, latex, compact, compact_not, definitions, announce)}`;
                 str += (wrap ? `(${res})` : res);
                 break;
 
