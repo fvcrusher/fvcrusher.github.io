@@ -139,6 +139,15 @@ class Formula
             throw new Error(`Parameter must be \"number\" or \"string\", but \"${typeof operator}\" given`);
     }
 
+    emplace(other)
+    {
+        this.lop = other.lop;
+        this.rop = other.rop;
+        this.opc = other.opc;
+        this.name = other.name;
+        this.#error_info = other.#error_info;
+    }
+
     static true()
     {
         return new Formula(Formula.Operator.TRUE);
