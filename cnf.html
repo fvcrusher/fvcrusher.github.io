@@ -182,14 +182,11 @@
             add_paragraph(outputDiv, `Преобразуем изначальное выражение \$${solver.initial_formula.cnf_latex}\$ в конъюнктивную нормальную форму (КНФ). Для этого начиная с наиболее глубоко вложенных подвыражений будем производить замены.`);
 
             draw_table(outputDiv, solver.solution_steps);
-            // for (let i = 0; i < solver.solution_steps.length; i++)
-            // {
-            //     let step = solver.solution_steps[i];
-            //     add_paragraph(outputDiv, `Замена \$${step.replacement.cnf_latex} = ${step.initial_operation.cnf_latex}\$; КНФ: \$${step.cnf_part.cnf_latex}\$`);
-            // }
 
-            add_paragraph(outputDiv, `Итоговая КНФ - это комбинация всех частей КНФ полученных на этапах замены и последней введенной переменной. Классическая запись: ${solver.cnf_latex}`);
-            add_paragraph(outputDiv, `Компактный формат записи: ${solver.cnf_parts_latex}`);
+            add_paragraph(outputDiv, `Итоговая КНФ - это комбинация всех частей КНФ, полученных на этапах замены, и последней введенной переменной. Классическая запись КНФ в виде логического выражения выглядит следующим образом:`);
+            add_paragraph(outputDiv, solver.cnf_latex, true);
+            add_paragraph(outputDiv, `Также КНФ можно записать в компактном виде, как множество клауз:`);
+            add_paragraph(outputDiv, solver.cnf_parts_latex, true);
 
             outputDiv.style.display = "block";
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
