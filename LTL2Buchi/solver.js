@@ -840,6 +840,9 @@ export class Solver
         else if (ltl instanceof Formula)
             parsed_ltl = Formula.copy(ltl);
 
+        if (parsed_ltl == null)
+            return [];
+
         return parsed_ltl.errors;
     }
 }

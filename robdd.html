@@ -115,7 +115,10 @@
             </div>
 
             <input type="text" id="expression" placeholder="Введите логическое выражение...">
+            <div id="errorOutput" class="error-output"></div>
+            
             <input type="text" id="atomsOrder" placeholder="Введите порядок переменных (через пробел)...">
+
             <button class="solve-button" onclick="run_solver()">Решить</button>
         </div>
         <div id="output" class="output">
@@ -335,9 +338,61 @@
             source_button.style.cursor = "default";
         }
 
+        function get_error_text(error)
+        {
+            let expected = null;
+            if (error.expected == "EOL")
+                expected = "ожидался конец строки";
+            else if (error.expected == "variable name")
+                expected = "ожидалось имя переменной";
+            else if (error.expected == ")" || error.expected == "]" || error.expected == "}")
+                expected = `ожидалась закрывающая скобка '${error.expected}'`;
+            else if (error.expected == "classic operator")
+                expected = "ожидался оператор классической логики";
+            else if (error.expected == "ltl operator")
+                expected = "ожидался оператор логики линейного времени";
+            else
+                expected = `ожидался символ '${error.expected}'`;
+
+            let found = null;
+            if (error.found == "EOL")
+                found = "обнаружен конец строки";
+            else if (error.found == "variable name")
+                found = "обнаружено имя переменной";
+            else if (error.found == "classic operator")
+                found = "обнаружен оператор классической логики";
+            else if (error.found == "ltl operator")
+                found = "обнаружен оператор логики линейного времени";
+            else
+                found = `обнаружен символ '${error.found}'`;
+
+            let position = null;
+            if (error.index == null || error.index == -1)
+                position = "В формуле";
+            else
+                position = `На позиции ${error.index}`;
+
+            return `${position} ${found}, однако ${expected}`;
+        }
+
+        function fill_error_output(output, errors)
+        {
+            while(output.firstChild)
+                output.removeChild(output.lastChild)
+
+            for (let i = 0; i < errors.length; i++)
+            {
+                let err_par = document.createElement('p');
+                err_par.appendChild(document.createTextNode(get_error_text(errors[i])));
+                err_par.classList.add("error-par");
+                output.appendChild(err_par);
+            }
+        }
+
         function process_input_update()
         {
             const inputField = document.getElementById("expression");
+            const errorOutputDiv = document.getElementById("errorOutput");
             let errors = ROBDDBuilder.Solver.check_syntax(inputField.value);
             let atoms = ROBDDBuilder.Solver.get_atoms(inputField.value)
 
@@ -346,12 +401,15 @@
                 inputField.style.removeProperty("border-color");
                 inputField.style.removeProperty("border-width");
                 inputField.style.removeProperty("padding");
+                errorOutputDiv.classList.remove("open");
             }
             else
             {
                 inputField.style.borderColor = "red";
                 inputField.style.borderWidth = "3px";
                 inputField.style.padding = "10px";
+                errorOutputDiv.classList.add("open");
+                fill_error_output(errorOutputDiv, errors);
             }
         }
         document.getElementById("expression").addEventListener("input", process_input_update);

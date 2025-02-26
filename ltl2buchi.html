@@ -133,6 +133,8 @@
             </div>
 
             <input type="text" id="textInput" placeholder="Введите LTL...">
+            <div id="errorOutput" class="error-output"></div>
+            
             <div class="ltl2buchi-settings">
                 <div class="switch-container">
                     <label class="switch">
@@ -372,12 +374,83 @@
             }
 
             outputDiv.style.display = "block";
-
-            // if (table.scrollWidth > (outputDiv.clientWidth - 30))
-            //     add_paragraph(outputDiv, "Таблица оказалось слишком широкой, не забудьте про горизонтальную прокрутку!", false, true);
-
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
         }
+
+        function get_error_text(error)
+        {
+            let expected = null;
+            if (error.expected == "EOL")
+                expected = "ожидался конец строки";
+            else if (error.expected == "variable name")
+                expected = "ожидалось имя переменной";
+            else if (error.expected == ")" || error.expected == "]" || error.expected == "}")
+                expected = `ожидалась закрывающая скобка '${error.expected}'`;
+            else if (error.expected == "classic operator")
+                expected = "ожидался оператор классической логики";
+            else if (error.expected == "ltl operator")
+                expected = "ожидался оператор логики линейного времени";
+            else
+                expected = `ожидался символ '${error.expected}'`;
+
+            let found = null;
+            if (error.found == "EOL")
+                found = "обнаружен конец строки";
+            else if (error.found == "variable name")
+                found = "обнаружено имя переменной";
+            else if (error.found == "classic operator")
+                found = "обнаружен оператор классической логики";
+            else if (error.found == "ltl operator")
+                found = "обнаружен оператор логики линейного времени";
+            else
+                found = `обнаружен символ '${error.found}'`;
+
+            let position = null;
+            if (error.index == null || error.index == -1)
+                position = "В формуле";
+            else
+                position = `На позиции ${error.index}`;
+
+            return `${position} ${found}, однако ${expected}`;
+        }
+
+        function fill_error_output(output, errors)
+        {
+            while(output.firstChild)
+                output.removeChild(output.lastChild)
+
+            for (let i = 0; i < errors.length; i++)
+            {
+                let err_par = document.createElement('p');
+                err_par.appendChild(document.createTextNode(get_error_text(errors[i])));
+                err_par.classList.add("error-par");
+                output.appendChild(err_par);
+            }
+        }
+
+        function process_input_update()
+        {
+            const inputField = document.getElementById("textInput");
+            const errorOutputDiv = document.getElementById("errorOutput");
+            let errors = LTL2Buchi.Solver.check_syntax(inputField.value);
+
+            if (errors.length == 0)
+            {
+                inputField.style.removeProperty("border-color");
+                inputField.style.removeProperty("border-width");
+                inputField.style.removeProperty("padding");
+                errorOutputDiv.classList.remove("open");
+            }
+            else
+            {
+                inputField.style.borderColor = "red";
+                inputField.style.borderWidth = "3px";
+                inputField.style.padding = "10px";
+                errorOutputDiv.classList.add("open");
+                fill_error_output(errorOutputDiv, errors);
+            }
+        }
+        document.getElementById("textInput").addEventListener("input", process_input_update);
     </script>
 </body>
 </html>

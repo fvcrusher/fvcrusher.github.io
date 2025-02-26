@@ -141,6 +141,8 @@ class Parser
     {
         this.#stream = new Stream(formula);
         this.#stream.remove_spaces();
+        if (this.#stream.end)
+            return null;
         let result = this.GetImpl();
         if (!this.#stream.end)
             return Formula.error(this.#stream.initial_str, this.#stream.initial_counter, "EOL", this.#stream.current, `Expected end of line, but '${this.#stream.current}' found`)

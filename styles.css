@@ -533,3 +533,21 @@ p.faq-par {
     margin: 5px 0px;
     text-align: left;
 }
+
+div.error-output {
+    display: none;
+    margin-top: -16px;
+    margin-bottom: 12px;
+    border-radius: 0px 0px 5px 5px;
+    background-color: rgb(255, 177, 177);
+    padding: 9px 5px 5px 5px;
+    text-align: left;
+}
+
+div.error-output.open {
+    display: block;
+}
+
+p.error-par {
+    margin: 0px;
+}
