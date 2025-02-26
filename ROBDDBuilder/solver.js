@@ -388,10 +388,13 @@ export class Solver
         else if (ltl instanceof Formula)
             parsed_ltl = Formula.copy(ltl);
 
+        if (parsed_ltl == null)
+            return [];
+
         let errors = parsed_ltl.errors;
 
         if (!parsed_ltl.contains_only(Formula.BooleanOperators))
-            errors.push({string: ltl, index: -1, expected: "", found: "", message: "Formula must contain only classic boolean operators"})
+            errors.push({string: ltl, index: -1, expected: "classic operator", found: "ltl operator", message: "Formula must contain only classic boolean operators"})
 
         return errors;
     }
