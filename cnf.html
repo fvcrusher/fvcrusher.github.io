@@ -115,7 +115,7 @@
             <input type="text" id="expression" placeholder="Введите логическое выражение...">
             <div id="errorOutput" class="error-output"></div>
 
-            <button class="solve-button" onclick="run_solver()">Решить</button>
+            <button id="solveButton" class="solve-button" onclick="run_solver()">Решить</button>
         </div>
         <div id="output" class="output">
             <p class="warning">
@@ -305,6 +305,7 @@
         {
             const inputField = document.getElementById("expression");
             const errorOutputDiv = document.getElementById("errorOutput");
+            const solveButton = document.getElementById("solveButton");
             let errors = CNFBuilder.Solver.check_syntax(inputField.value);
 
             if (errors.length == 0)
@@ -313,6 +314,7 @@
                 inputField.style.removeProperty("border-width");
                 inputField.style.removeProperty("padding");
                 errorOutputDiv.classList.remove("open");
+                solveButton.disabled = false;
             }
             else
             {
@@ -321,6 +323,7 @@
                 inputField.style.padding = "10px";
                 errorOutputDiv.classList.add("open");
                 fill_error_output(errorOutputDiv, errors);
+                solveButton.disabled = true;
             }
         }
         document.getElementById("expression").addEventListener("input", process_input_update);

@@ -119,7 +119,7 @@
             
             <input type="text" id="atomsOrder" placeholder="Введите порядок переменных (через пробел)...">
 
-            <button class="solve-button" onclick="run_solver()">Решить</button>
+            <button id="solveButton" class="solve-button" onclick="run_solver()">Решить</button>
         </div>
         <div id="output" class="output">
             <p class="warning">
@@ -393,6 +393,7 @@
         {
             const inputField = document.getElementById("expression");
             const errorOutputDiv = document.getElementById("errorOutput");
+            const solveButton = document.getElementById("solveButton");
             let errors = ROBDDBuilder.Solver.check_syntax(inputField.value);
             let atoms = ROBDDBuilder.Solver.get_atoms(inputField.value)
 
@@ -402,6 +403,7 @@
                 inputField.style.removeProperty("border-width");
                 inputField.style.removeProperty("padding");
                 errorOutputDiv.classList.remove("open");
+                solveButton.disabled = false;
             }
             else
             {
@@ -410,6 +412,7 @@
                 inputField.style.padding = "10px";
                 errorOutputDiv.classList.add("open");
                 fill_error_output(errorOutputDiv, errors);
+                solveButton.disabled = true;
             }
         }
         document.getElementById("expression").addEventListener("input", process_input_update);
