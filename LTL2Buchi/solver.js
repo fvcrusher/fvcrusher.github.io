@@ -238,6 +238,7 @@ export class Solver
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
+            case Formula.Operator.XOR:
             case Formula.Operator.IMPL:
             case Formula.Operator.U:
             case Formula.Operator.W:
@@ -277,6 +278,7 @@ export class Solver
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
+            case Formula.Operator.XOR:
             case Formula.Operator.IMPL:
             case Formula.Operator.U:
             case Formula.Operator.W:
@@ -316,6 +318,7 @@ export class Solver
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
+            case Formula.Operator.XOR:
             case Formula.Operator.IMPL:
             case Formula.Operator.U:
             case Formula.Operator.R:
@@ -354,6 +357,7 @@ export class Solver
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
+            case Formula.Operator.XOR:
             case Formula.Operator.IMPL:
             case Formula.Operator.U:
             case Formula.Operator.W:
@@ -385,6 +389,7 @@ export class Solver
 
             case Formula.Operator.AND:
             case Formula.Operator.OR:
+            case Formula.Operator.XOR:
             case Formula.Operator.IMPL:
             case Formula.Operator.U:
             case Formula.Operator.W:
