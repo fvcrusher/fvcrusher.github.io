@@ -499,6 +499,8 @@ button.faq-button {
     display: flex;
     padding: 0px;
     justify-content: right;
+    margin-left: auto;
+    width: fit-content;
 }
 
 .dropdown-arrow {
@@ -523,7 +525,6 @@ button.faq-button {
 }
 
 .faq-text.open {
-    max-height: 600px; /* Достаточно большое значение */
     margin-bottom: 12px;
     padding: 10px;
 }

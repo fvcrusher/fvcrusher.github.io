@@ -77,6 +77,10 @@
                     const faqButton = document.getElementById("faqButton");
                     const arrow = document.getElementById("faqDropdown");
                     const isOpen = faqText.classList.toggle("open");
+                    if (isOpen)
+                        faqText.style.setProperty("max-height", `${faqText.scrollHeight}px`);
+                    else
+                        faqText.style.removeProperty("max-height");
                     arrow.classList.toggle("up");
                 };
             </script>
