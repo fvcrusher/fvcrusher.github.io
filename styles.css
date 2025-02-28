@@ -143,20 +143,6 @@ input[type="text"] {
     transition: none;
 }
 
-.output {
-    margin-top: 20px;
-    margin: auto;
-    max-width: 60em;
-    padding: 15px;
-    background-color: #ededed;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
-    color: #333;
-    display: none;
-    text-align: left;
-}
-
 .wide-output {
     overflow-x: auto;
 }
@@ -336,6 +322,40 @@ ul {
     transition: color 0.3s;
 }
 
+.output {
+    display: none;
+    margin-top: 20px;
+    margin: auto;
+    max-width: 60em;
+    font-size: 1em;
+    color: #333;
+    text-align: left;
+}
+
+.nav-panel {
+    margin: auto;
+    max-width: 60em;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.footer-link-text {
+    display: none;
+}
+
+.footer-container {
+    padding: 0px 20px;
+    max-width: 60em;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+}
+
 @media (min-width: 601px) 
 {
     .footer-link-text {
@@ -343,50 +363,18 @@ ul {
     }
 
     .footer-container {
-        padding: 0px 20px;
-        max-width: 60em;
-        display: flex;
         justify-content: space-between;
-        margin: auto;
     }
 
     .nav-panel {
-        margin: auto;
-        max-width: 60em;
-        display: flex;
         flex-direction: row;
-        overflow: hidden;
-        justify-content: space-between;
-        gap: 10px;
-        align-items: center;
-        transition: all 0.3s;
-    }
-}
-
-@media (max-width: 600px) 
-{
-    .footer-link-text {
-        display: none;
     }
 
-    .footer-container {
-        padding: 0px 20px;
-        max-width: 60em;
-        display: flex;
-        justify-content: center;
-        margin: auto;
-    }
-
-    .nav-panel {
-        margin: auto;
-        max-width: 60em;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        justify-content: space-between;
-        gap: 10px;
-        align-items: center;
-        transition: all 0.3s;
+    .output {
+        padding: 15px;
+        background-color: #ededed;
+        border: 1px solid #ccc;
+        border-radius: 5px;
     }
 }
 
