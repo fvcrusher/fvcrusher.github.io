@@ -519,6 +519,7 @@ button.faq-button {
 }
 
 .dropdown-arrow {
+    user-select: none;
     transition: all 0.3s ease-in-out;
     max-width: min-content;
     margin-left: 10px;
@@ -565,4 +566,59 @@ div.error-output.open {
 
 p.error-par {
     margin: 0px;
+}
+
+.robdd-expression-input {
+    display: flex;
+}
+
+.robdd-input-container {
+    margin-bottom: 12px;
+}
+
+.dropdown-container {
+    background-color: #c2c2c2;
+    position: relative;
+    transition: 0.3s;
+    display: none;
+}
+
+.dropdown-container.open {
+    display: block;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 2.5%;
+    width: 95%;
+    border: 1px solid #ccc;
+    border-top: none;
+    background: white;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    text-align: left;
+    border-radius: 0px 0px 5px 5px;
+}
+
+.dropdown-list-item {
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.dropdown-list-item:hover {
+    background-color: #dadada;
+}
+
+.input-dropdown {
+    transition: all 0.3s ease-in-out;
+    user-select: none;
+    max-width: min-content;
+    margin-left: -30px;
+    padding: 12px 5px;
+    cursor: pointer;
 }

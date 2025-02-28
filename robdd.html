@@ -111,10 +111,37 @@
                 <p class="faq-par">Можно использовать любые скобки в выражении - фигурные, квадратные и круглые. Выражения в скобках вычисляются с наивысшим приоритетом.</p>
                 <p class="faq-par">Пример формулы: <span class="code-cell">(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & (x0 & !y0))))</span>.</p>
                 <p class="faq-par">Для построения ROBDD необходимо указать порядок переменных, по которому будет производится подстановка значений. В случае, если порядок не указан, им будет порядок появления переменных в формуле.</p>
-                <p class="faq-par">В случае, если в условии формула задана косвенно (например: трехбитное сложение <span class="code-cell">(x2 x1 x0) + (y2 y1 y0)</span>), то булеву формулу для него можно взять из выпадающего списка в окне ввода формулы.</p>
+                <p class="faq-par">В случае, если в условии формула задана косвенно (например: старший бит трехбитного сложения <span class="code-cell">x₂x₁x₀ + y₂y₁y₀</span>), то булеву формулу для него можно взять из выпадающего списка в окне ввода формулы.</p>
             </div>
 
-            <input type="text" id="expression" placeholder="Введите логическое выражение...">
+            <div class="robdd-input-container">
+                <div class="robdd-expression-input">
+                    <input type="text" id="expression" placeholder="Введите логическое выражение..." style="margin-bottom: 0px;">
+                    <div id="inputDropdown" class="input-dropdown" onclick="document.getElementById('implicitFormulas').classList.toggle('open')">▼</div>
+                </div>
+            
+                <div id="implicitFormulas" class="dropdown-container">
+                    <ul class="dropdown-list">
+                        <li id="highBitOfSum" class="dropdown-list-item" onclick="setValue(this)">Бит z₂ сумматора x₂x₁x₀ + y₂y₁y₀</li>
+                        <li id="signedComparison" class="dropdown-list-item" onclick="setValue(this)">Знаковое сравнение x₂x₁x₀ ≥ y₂y₁y₀</li>
+                        <li id="unsignedComparison" class="dropdown-list-item" onclick="setValue(this)">Беззнаковое сравнение x₂x₁x₀ ≥ y₂y₁y₀</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <script>
+                const aliases = {
+                    "highBitOfSum": "(x2 + y2) + ((x1 & y1) | ((x1 & x0) & y0) | ((y1 & x0) & y0))",
+                    "signedComparison": "(!x2 & y2) | (((x1 & !y1) | (!(x1 + y1) & ((x0 & !y0) | !(x0 + y0)))) & (!x2 & !y2)) | (((!x1 & y1) | (!(x1 + y1) & ((!x0 & y0) | !(x0 + y0)))) & (x2 & y2))",
+                    "unsignedComparison": "(x2 & !y2) | (!(x2 + y2) & ((x1 & !y1) | (!(x1 + y1) & ((x0 & y0) | !(x0 + y0)))))"
+                }
+
+                function setValue(button) {
+                    const inputField = document.getElementById("expression");
+                    inputField.value = aliases[button.id];
+                    document.getElementById('implicitFormulas').classList.toggle('open');
+                }
+            </script>
             <div id="errorOutput" class="error-output"></div>
             
             <input type="text" id="atomsOrder" placeholder="Введите порядок переменных (через пробел)...">
