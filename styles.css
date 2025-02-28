@@ -211,6 +211,7 @@ input[type="text"] {
     border-radius: 8px;
     padding: 5px;
     text-align: center;
+    margin-top: 0px;
 }
 
 footer {
