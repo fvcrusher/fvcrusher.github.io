@@ -1,0 +1,27 @@
+{
+    "4.pml": {
+        "task_id": "jealous_couples_2024",
+        "startup_cmd": "",
+        "comment": "Решение автора fvcrusher"
+    },
+    "7.pml": {
+        "task_id": "fear_of_the_dark_2024",
+        "startup_cmd": "",
+        "comment": "Решение автора fvcrusher"
+    },
+    "8.pml": {
+        "task_id": "tower_of_hanoi_2024",
+        "startup_cmd": "",
+        "comment": "Решение автора fvcrusher"
+    },
+    "9.pml": {
+        "task_id": "knights_walk_around_the_chessboard_2024",
+        "startup_cmd": "",
+        "comment": "Похоже, что решение верное, но проверить не удалось - не хватило ресурсов для обсчета, spin уехал в swap"
+    },
+    "16.pml": {
+        "task_id": "six_checkers_2024",
+        "startup_cmd": "",
+        "comment": "Альтернатива для перебора всех возможных перестановок в do-od - использование rand() или select() (читайте в манах на spin). Однако использование этих операторов значительно повышает расходы ресурсов и время обсчета задачи. Если у вас мощный ПК, можете использовать альтернативное решение с использованием select()."
+    }
+}
