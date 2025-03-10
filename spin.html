@@ -22,9 +22,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
-    <!-- and it's easy to individually load additional languages -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <header>
@@ -143,58 +141,458 @@
             </script>
         </div>
         <script>
-
-            const test_tasks = [
-                {
-                    "id": "jealous_couples_2024",
-                    "name": "Ревнивые пары",
-                    "task": "Необходимо переправить три пары из женихов и невест с использованием лодки, которая может выдержать только двоих. Женихи ревнивы и не могут допустить того, чтобы их невеста оказалась с чужим женихом в лодке или на берегу, если их нет рядом."
-                },
-                {
-                    "id": "fear_of_the_dark_2024",
-                    "name": "Боязнь темноты",
-                    "task": "Одной семье надо пройти на другую сторону длинного, узкого и темного тоннеля. Отец может пройти сквозь тоннель за 1 минуту, мать — за 2, сын — за 4, дочь — за 5. У них есть один факел, которого хватит ровно на 12 минут. В тоннеле могут идти не больше двух человек (скорость их передвижения определяется самым медленным из них). Как семье перебраться на другую строну тоннеля, если все боятся темноты?"
-                },
-                {
-                    "id": "tower_of_hanoi_2024",
-                    "name": "Ханойская башня",
-                    "task": "Даны три стержня, на один из которых нанизаны 8 (в общем случае 𝑁) колец. Кольца отличаются размером и лежат меньшее на большем. Задача состоит в том, чтобы перенести пирамиду из колец на другой стержень. За один раз разрешается переносить только одно кольцо, причем нельзя класть большее кольцо на меньшее."
-                }
-            ]
-
-            const test_solutions = {
-                "4.pml": {
-                    "task_id": "jealous_couples_2024",
-                    "startup_cmd": "spin -t -run 4.pml",
-                    "comment": "Решение автора fvcrusher"
-                },
-                "7.pml": {
-                    "task_id": "fear_of_the_dark_2024",
-                    "startup_cmd": "",
-                    "comment": "Решение автора fvcrusher"
-                },
-                "8.pml": {
-                    "task_id": "tower_of_hanoi_2024",
-                    "startup_cmd": "",
-                    "comment": "Решение автора fvcrusher"
-                },
-                "9.pml": {
-                    "task_id": "fear_of_the_dark_2024",
-                    "startup_cmd": "",
-                    "comment": "Похоже, что решение верное, но проверить не удалось - не хватило ресурсов для обсчета, spin уехал в swap"
-                },
-                "16.pml": {
-                    "task_id": "tower_of_hanoi_2024",
-                    "startup_cmd": "",
-                    "comment": "Альтернатива для перебора всех возможных перестановок в do-od - использование rand() или select() (читайте в манах на spin). Однако использование этих операторов значительно повышает расходы ресурсов и время обсчета задачи. Если у вас мощный ПК, можете использовать альтернативное решение с использованием select()."
-                }
-            }
-
             function getTasks()
             {
-                fetch("./spin/tasks.json")
-                    .then(response => response.json())
-                    .then(json => console.log(json));
+                // fetch("./spin/tasks.json")
+                //     .then(response => response.json())
+                //     .then(json => console.log(json));
+                return [
+                    {
+                        "id": "jealous_couples_2024",
+                        "name": "Ревнивые пары",
+                        "task": "Необходимо переправить три пары из женихов и невест с использованием лодки, которая может выдержать только двоих. Женихи ревнивы и не могут допустить того, чтобы их невеста оказалась с чужим женихом в лодке или на берегу, если их нет рядом."
+                    },
+                    {
+                        "id": "fear_of_the_dark_2024",
+                        "name": "Боязнь темноты",
+                        "task": "Одной семье надо пройти на другую сторону длинного, узкого и темного тоннеля. Отец может пройти сквозь тоннель за 1 минуту, мать — за 2, сын — за 4, дочь — за 5. У них есть один факел, которого хватит ровно на 12 минут. В тоннеле могут идти не больше двух человек (скорость их передвижения определяется самым медленным из них). Как семье перебраться на другую строну тоннеля, если все боятся темноты?"
+                    },
+                    {
+                        "id": "tower_of_hanoi_2024",
+                        "name": "Ханойская башня",
+                        "task": "Даны три стержня, на один из которых нанизаны 8 (в общем случае 𝑁) колец. Кольца отличаются размером и лежат меньшее на большем. Задача состоит в том, чтобы перенести пирамиду из колец на другой стержень. За один раз разрешается переносить только одно кольцо, причем нельзя класть большее кольцо на меньшее."
+                    },
+                    {
+                        "id": "eight_queens_2024",
+                        "name": "Восемь ферзей",
+                        "task": "Требуется расставить на шахматной доске 8 ферзей так, чтобы ни один из них не находился под боем другого (в общем случае размер доски 𝑁 × 𝑁, а ферзей 𝑁)."
+                    }
+                ];
+            }
+
+            function getSolutions()
+            {
+                // fetch("./spin/solutions/index.json")
+                //     .then(response => response.json())
+                //     .then(json => console.log(json));
+                return {
+                    "4.pml": {
+                        "task_id": "jealous_couples_2024",
+                        "startup_cmd": "spin -t -run 4.pml",
+                        "comment": "Решение автора fvcrusher"
+                    },
+                    "7.pml": {
+                        "task_id": "fear_of_the_dark_2024",
+                        "startup_cmd": "",
+                        "comment": "Решение автора fvcrusher"
+                    },
+                    "8.pml": {
+                        "task_id": "tower_of_hanoi_2024",
+                        "startup_cmd": "",
+                        "comment": "Решение автора fvcrusher"
+                    },
+                    "9.pml": {
+                        "task_id": "fear_of_the_dark_2024",
+                        "startup_cmd": "",
+                        "comment": "Похоже, что решение верное, но проверить не удалось - не хватило ресурсов для обсчета, spin уехал в swap"
+                    },
+                    "16.pml": {
+                        "task_id": "tower_of_hanoi_2024",
+                        "startup_cmd": "",
+                        "comment": "Альтернатива для перебора всех возможных перестановок в do-od - использование rand() или select() (читайте в манах на spin). Однако использование этих операторов значительно повышает расходы ресурсов и время обсчета задачи. Если у вас мощный ПК, можете использовать альтернативное решение с использованием select()."
+                    }
+                };
+            }
+
+            function getSolutionText(filename)
+            {
+                // fetch(`./spin/solutions/${filename}`)
+                //     .then(response => response.json())
+                //     .then(json => console.log(json));
+                texts = {
+                    "4.pml": `bit w1 = 0;
+bit w2 = 0;
+bit w3 = 0;
+bit m1 = 0;
+bit m2 = 0;
+bit m3 = 0;
+bit boat = 0;
+
+#define PRINTF_STATUS printf("Кто где: %d %d %d %d %d %d\\n", m1, m2, m3, w1, w2, w3)
+
+#define GOAL (w1 && w2 && w3 && m1 && m2 && m3)
+
+active proctype Transfer() {
+    do
+    :: (boat == w1) -> atomic { printf("Невеста #1 переплыла с берега %d на берег %d\\n", w1, !w1); w1 = !w1; boat = !boat; PRINTF_STATUS; }
+    :: (boat == w2) -> atomic { printf("Невеста #2 переплыла с берега %d на берег %d\\n", w2, !w2); w2 = !w2; boat = !boat; PRINTF_STATUS; }
+    :: (boat == w3) -> atomic { printf("Невеста #3 переплыла с берега %d на берег %d\\n", w3, !w3); w3 = !w3; boat = !boat }
+
+    :: (boat == m1) -> atomic { printf("Жених #1 переплыл с берега %d на берег %d\\n", m1, !m1); m1 = !m1; boat = !boat; PRINTF_STATUS; }
+    :: (boat == m2) -> atomic { printf("Жених #2 переплыл с берега %d на берег %d\\n", m2, !m2); m2 = !m2; boat = !boat; PRINTF_STATUS; }
+    :: (boat == m3) -> atomic { printf("Жених #3 переплыл с берега %d на берег %d\\n", m3, !m3); m3 = !m3; boat = !boat; PRINTF_STATUS; }
+
+    :: (boat == m1 && boat == m2) -> atomic { printf("Женихи #1 и #2 переплыли с берега %d на берег %d\\n", m1, !m1); m1 = !m1; m2 = !m2; boat = !boat; PRINTF_STATUS; }
+    :: (boat == m2 && boat == m3) -> atomic { printf("Женихи #2 и #3 переплыли с берега %d на берег %d\\n", m2, !m2); m2 = !m2; m3 = !m3; boat = !boat; PRINTF_STATUS; }
+    :: (boat == m1 && boat == m3) -> atomic { printf("Женихи #1 и #3 переплыли с берега %d на берег %d\\n", m1, !m1); m1 = !m1; m3 = !m3; boat = !boat; PRINTF_STATUS; }
+
+    :: (boat == w1 && boat == w2) -> atomic { printf("Невесты #1 и #2 переплыли с берега %d на берег %d\\n", w1, !w1); w1 = !w1; w2 = !w2; boat = !boat; PRINTF_STATUS; }
+    :: (boat == w2 && boat == w3) -> atomic { printf("Невесты #2 и #3 переплыли с берега %d на берег %d\\n", w2, !w2); w2 = !w2; w3 = !w3; boat = !boat; PRINTF_STATUS; }
+    :: (boat == w1 && boat == w3) -> atomic { printf("Невесты #1 и #3 переплыли с берега %d на берег %d\\n", w1, !w1); w1 = !w1; w3 = !w3; boat = !boat; PRINTF_STATUS; }
+
+    :: (boat == m1 && boat == w1) -> atomic { printf("Жених и невеста #1 переплыли с берега %d на берег %d\\n", m1, !m1); m1 = !m1; w1 = !w1; boat = !boat; PRINTF_STATUS; }
+    :: (boat == m2 && boat == w2) -> atomic { printf("Жених и невеста #2 переплыли с берега %d на берег %d\\n", m2, !m2); m2 = !m2; w2 = !w2; boat = !boat; PRINTF_STATUS; }
+    :: (boat == m3 && boat == w3) -> atomic { printf("Жених и невеста #3 переплыли с берега %d на берег %d\\n", m3, !m3); m3 = !m3; w3 = !w3; boat = !boat; PRINTF_STATUS; }
+    od
+}
+
+ltl { !(<>GOAL) }`,
+                    "7.pml": `bit father = 0;
+bit mother = 0;
+bit son = 0;
+bit dauther = 0;
+bit torch = 0;
+byte elapsed_time = 0;
+
+#define FATHER_TIME 1
+#define MOTHER_TIME 2
+#define SON_TIME 4
+#define DAUGTHER_TIME 5
+#define TORCH_TIME 12
+
+#define STATUS printf("Кто где: %d %d %d %d, Прошло %d минут\\n", father, mother, son, dauther, elapsed_time)
+
+#define GOAL (father && mother && son && dauther && elapsed_time <= TORCH_TIME)
+
+active proctype Tunnel() {
+    do    
+    :: (father == torch && elapsed_time < TORCH_TIME) ->  atomic { printf("Отец прошел из %d в %d", father, !father);    elapsed_time = elapsed_time + FATHER_TIME;    father = !father;    torch = !torch;  STATUS; }
+    :: (mother == torch && elapsed_time < TORCH_TIME) ->  atomic { printf("Мать прошла из %d в %d", mother, !mother);    elapsed_time = elapsed_time + MOTHER_TIME;    mother = !mother;    torch = !torch;  STATUS; }
+    :: (son == torch && elapsed_time < TORCH_TIME) ->     atomic { printf("Сын прошел из %d в %d", son, !son);           elapsed_time = elapsed_time + SON_TIME;       son = !son;          torch = !torch;  STATUS; }
+    :: (dauther == torch && elapsed_time < TORCH_TIME) -> atomic { printf("Дочь прошла из %d в %d", dauther, !dauther);  elapsed_time = elapsed_time + DAUGTHER_TIME;  dauther = !dauther;  torch = !torch;  STATUS; }
+
+    :: (father == torch && mother == torch && elapsed_time < TORCH_TIME) ->  atomic { printf("Отец и мать прошли из %d в %d", father, !father);  elapsed_time = elapsed_time + MOTHER_TIME;    father = !father;  mother =! mother;    torch = !torch;  STATUS; }
+    :: (father == torch && son == torch && elapsed_time < TORCH_TIME) ->     atomic { printf("Отец и сын прошли из %d в %d", father, !father);   elapsed_time = elapsed_time + SON_TIME;       father = !father;  son =! son;          torch = !torch;  STATUS; }
+    :: (father == torch && dauther == torch && elapsed_time < TORCH_TIME) -> atomic { printf("Отец и дочь прошли из %d в %d", father, !father);  elapsed_time = elapsed_time + DAUGTHER_TIME;  father = !father;  dauther =! dauther;  torch = !torch;  STATUS; }
+    :: (mother == torch && son == torch && elapsed_time < TORCH_TIME) ->     atomic { printf("Мать и сын прошли из %d в %d", mother, !mother);   elapsed_time = elapsed_time + SON_TIME;       mother = !mother;  son =! son;          torch = !torch;  STATUS; }
+    :: (mother == torch && dauther == torch && elapsed_time < TORCH_TIME) -> atomic { printf("Мать и дочь прошли из %d в %d", mother, !mother);  elapsed_time = elapsed_time + DAUGTHER_TIME;  mother = !mother;  dauther =! dauther;  torch = !torch;  STATUS; }
+    :: (son == torch && dauther == torch && elapsed_time < TORCH_TIME) ->    atomic { printf("Сын и дочь прошли из %d в %d", son, !son);         elapsed_time = elapsed_time + DAUGTHER_TIME;  son = !son;        dauther =! dauther;  torch = !torch;  STATUS; }
+    od
+}
+
+ltl { !(<>GOAL); }`,
+                    "8.pml": `// Works for every N!
+
+/* Всего 9 возможных действий:
+ *   1) Обмен между 1 и 2 (обе непустые)
+ *   2) Обмен между 2 и 3 (обе непустые)
+ *   3) Обмен между 1 и 3 (обе непустые)
+ *   4) С непустой 1 на пустую 2
+ *   5) С непустой 2 на пустую 1
+ *   6) С непустой 2 на пустую 3
+ *   7) С непустой 3 на пустую 2
+ *   8) С непустой 1 на пустую 3
+ *   9) С непустой 3 на пустую 1
+ */
+
+// time spin -run -i 8.pml --> 68.8 sec
+
+#define N 8
+
+byte rod1[N], rod2[N], rod3[N] = 0;
+byte rod1_idx, rod2_idx, rod3_idx = 0;
+
+#define MOVE(from, to) \
+    rod##to[rod##to##_idx] = rod##from[rod##from##_idx - 1]; \
+    rod##from[rod##from##_idx - 1] = 0; \
+    rod##from##_idx--; \
+    rod##to##_idx++;
+
+#define HEAD(where) rod##where[rod##where##_idx - 1]
+
+#define PRINT_STATE //printf("rod1: %d %d %d %d %d %d %d %d\\n\\trod2: %d %d %d %d %d %d %d %d\\n\\trod3: %d %d %d %d %d %d %d %d\\n", rod1[0], rod1[1], rod1[2], rod1[3], rod1[4], rod1[5], rod1[6], rod1[7], rod2[0], rod2[1], rod2[2], rod2[3], rod2[4], rod2[5], rod2[6], rod2[7], rod3[0], rod3[1], rod3[2], rod3[3], rod3[4], rod3[5], rod3[6], rod3[7])
+#define PRINT_ACTION(from, to) printf("Перекладываю кольцо размера %d со стержня %d на стержень %d\\n", rod##from[rod##from##_idx - 1], from, to);
+
+// Если на интересующем нас стержне лежат все кольца, а на других - ни одного,
+// то задача решена, так как перекладывать можем только меньшее на большее по 
+// proctype.
+#define ROD_FILLED(target_rod) (rod##target_rod##_idx == N)
+
+#define GOAL (ROD_FILLED(2) || ROD_FILLED(3)) 
+
+active proctype Hanoi() {
+    byte idx;
+    for (idx : 0 .. N - 1) {
+        rod1[idx] = N - idx;
+    }
+    rod1_idx = N;
+
+    do
+    :: (rod1_idx > 0 && rod2_idx > 0) -> atomic {
+        if
+        :: (HEAD(1) < HEAD(2)) -> atomic { PRINT_ACTION(1, 2); MOVE(1, 2); PRINT_STATE; }
+        :: (HEAD(1) > HEAD(2)) -> atomic { PRINT_ACTION(2, 1); MOVE(2, 1); PRINT_STATE; }
+        fi
+    }
+
+    :: (rod2_idx > 0 && rod3_idx > 0) -> atomic {
+        if
+        :: (HEAD(2) < HEAD(3)) -> atomic { PRINT_ACTION(2, 3); MOVE(2, 3); PRINT_STATE; }
+        :: (HEAD(2) > HEAD(3)) -> atomic { PRINT_ACTION(3, 2); MOVE(3, 2); PRINT_STATE; }
+        fi
+    }
+
+    :: (rod1_idx > 0 && rod3_idx > 0) -> atomic {
+        if
+        :: (HEAD(1) < HEAD(3)) -> atomic { PRINT_ACTION(1, 3); MOVE(1, 3); PRINT_STATE; }
+        :: (HEAD(1) > HEAD(3)) -> atomic { PRINT_ACTION(3, 1); MOVE(3, 1); PRINT_STATE; }
+        fi
+    }
+
+    :: (rod1_idx > 0 && rod2_idx == 0) -> atomic { PRINT_ACTION(1, 2); MOVE(1, 2); PRINT_STATE; }
+    :: (rod1_idx == 0 && rod2_idx > 0) -> atomic { PRINT_ACTION(2, 1); MOVE(2, 1); PRINT_STATE; }
+
+    :: (rod2_idx > 0 && rod3_idx == 0) -> atomic { PRINT_ACTION(2, 3); MOVE(2, 3); PRINT_STATE; }
+    :: (rod2_idx == 0 && rod3_idx > 0) -> atomic { PRINT_ACTION(3, 2); MOVE(3, 2); PRINT_STATE; }
+
+    :: (rod1_idx > 0 && rod3_idx == 0) -> atomic { PRINT_ACTION(1, 3); MOVE(1, 3); PRINT_STATE; }
+    :: (rod1_idx == 0 && rod3_idx > 0) -> atomic { PRINT_ACTION(3, 1); MOVE(3, 1); PRINT_STATE; }
+    od
+}
+
+ltl { !(<>GOAL); }`,
+                    "9.pml": `#define N 8
+
+int visited_count = 0;
+int i_current, j_current = 0;
+typedef line {
+    bit content[N] = 0
+};
+line field[N];
+
+#define visited(i, j) (field[i].content[j] == 1)
+
+inline move(i, j) {
+    if
+    :: (!visited(i, j)) -> atomic {
+        i_current = i;
+        j_current = j;
+        field[i].content[j] = 1;
+        visited_count++
+    }
+    fi;
+}
+
+#define GOAL (visited_count == N * N) 
+
+proctype HobbieHorsing(int i, j) {
+    move(i, j);
+
+    do
+    :: (i >= 2 && j >= 1) -> atomic {
+        printf("Moving to (%d, %d)\\n", i - 2, j - 1);
+    }
+    :: (i >= 2 && j < N - 1) -> atomic {
+        printf("Moving to (%d, %d)\\n", i - 2, j + 1);
+    }
+
+    :: (i >= 1 && j >= 2) -> atomic {
+        printf("Moving to (%d, %d)\\n", i - 1, j - 2);
+    }
+    :: (i >= 1 && j < N - 2) -> atomic {
+        printf("Moving to (%d, %d)\\n", i - 1, j + 2);
+    }
+
+    :: (i < N - 2 && j >= 1) -> atomic {
+        printf("Moving to (%d, %d)\\n", i + 2, j - 1);
+    }
+    :: (i < N - 2 && j < N - 1) -> atomic {
+        printf("Moving to (%d, %d)\\n", i + 2, j + 1);
+    }
+
+    :: (i < N - 1 && j >= 2) -> atomic {
+        printf("Moving to (%d, %d)\\n", i + 1, j - 2);
+    }
+    :: (i < N - 1 && j < N - 2) -> atomic {
+        printf("Moving to (%d, %d)\\n", i + 1, j + 2);
+    }
+    od
+}
+
+init {
+    run HobbieHorsing(3, 3);
+}
+
+ltl { !(<>GOAL); }`,
+                    "16.pml": `#define WHITE 0
+#define BLACK 1
+
+#define EMPTY 0
+#define FILLED 1
+
+// Линия шашек будет представлена парами битов - первый бит указывает, занята ли
+// ячейка, вторая ячейка указывает на цвет шашки в ячейке, если ячейка занята.
+// Очевидно, ячеек всего 10 (6 шашек + 4 пустых места слева).
+bit field[20] = { 
+    EMPTY, 0, // ╮
+    EMPTY, 0, // ├─ Пустые ячейки (цвет обнуляем, нам он не важен с EMPTY ячейками).
+    EMPTY, 0, // │
+    EMPTY, 0, // ╯
+    FILLED, BLACK, // ╮
+    FILLED, WHITE, // │
+    FILLED, BLACK, // ├─ Разложенные шашки (черная, белая, черная, белая, черная, белая).
+    FILLED, WHITE, // │
+    FILLED, BLACK, // │
+    FILLED, WHITE  // ╯
+};
+
+
+// Проще всего будет понять, что все белые слева, а все черные - справа по 
+// индексу последней белой и индексу первой черной шашки.
+// Если last_white < first_black - значит мы добились того, чего хотели
+int last_white = 9;
+int first_black = 4;
+
+
+// Счетчик шагов решения
+byte steps = 0;
+
+#define SAFE steps < 3
+#define GOAL last_white < first_black
+
+
+// Для удобства чтения полученного решения загадки
+inline printState() {
+    printf("      ╭──────┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─╮\\n")
+    printf("╭─────┤Индекс│0│1│2│3│4│5│6│7│8│9│  ' ' - Пустое место\\n");
+    printf("│ШАГ %d├──────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  'B' - Черная шашка\\n", steps);
+    printf("╰─────┤Шашка │%c│%c│%c│%c│%c│%c│%c│%c│%c│%c│  'W' - Белая шашка\\n", 
+        (!field[0] -> ' ' : (field[1] -> 'B' : 'W')),
+        (!field[2] -> ' ' : (field[3] -> 'B' : 'W')),
+        (!field[4] -> ' ' : (field[5] -> 'B' : 'W')),
+        (!field[6] -> ' ' : (field[7] -> 'B' : 'W')),
+        (!field[8] -> ' ' : (field[9] -> 'B' : 'W')),
+        (!field[10] -> ' ' : (field[11] -> 'B' : 'W')),
+        (!field[12] -> ' ' : (field[13] -> 'B' : 'W')),
+        (!field[14] -> ' ' : (field[15] -> 'B' : 'W')),
+        (!field[16] -> ' ' : (field[17] -> 'B' : 'W')),
+        (!field[18] -> ' ' : (field[19] -> 'B' : 'W'))
+    );
+    printf("      ├──────┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┤\\n");
+    printf("      │ Последняя белая: %d       │\\n", last_white);
+    printf("      │ Первая черная: %d         │\\n", first_black);
+    printf("      ╰──────────────────────────╯\\n\\n");
+}
+
+
+// Перемещаем две шашки начиная с индекса i (i и i+1 шашки) на два пустых места
+// начиная с j (j и j+1 места)
+// Попутно увеличиваем кол-во шагов
+inline move(i, j) {
+    atomic {
+        steps++;
+
+        field[2 * j] = field[2 * i];
+        field[2 * j + 1] = field[2 * i + 1];
+        field[2 * (j + 1)] = field[2 * (i + 1)];
+        field[2 * (j + 1) + 1] = field[2 * (i + 1) + 1];
+
+        field[2 * i] = 0;
+        field[2 * i + 1] = 0;
+        field[2 * (i + 1)] = 0;
+        field[2 * (i + 1) + 1] = 0;
+
+        byte k;
+        for (k : 0..9) {
+            last_white = ((field[k * 2] && field[k * 2 + 1] == WHITE) -> k : last_white);
+            first_black = ((field[(9 - k) * 2] && field[(9 - k) * 2 + 1] == BLACK) -> (9 - k) : first_black);
+        }
+    }
+}
+
+
+// Проверка можем ли передвинуть шашки начиная с индекса i (i и i+1 шашки) на
+// два пустых места начиная с j (j и j+1 места)
+#define canMove(i, j) \
+    field[2 * i] && field[2 * (i + 1)] && \
+    !field[2 * j] && !field[2 * (j + 1)]
+
+
+// Веток много - сделаем дефайн для простоты
+#define branch(i, j) (canMove(i, j)) -> atomic { printf("ШАГ %d: Двигаем шашки с мест %d и %d на места %d и %d\\n", steps+1, i, i+1, j, j+1); move(i, j); printState(); }
+
+
+proctype Checkers() {
+    do
+    :: branch(0, 2)
+    :: branch(0, 3)
+    :: branch(0, 4)
+    :: branch(0, 5)
+    :: branch(0, 6)
+    :: branch(0, 7)
+    :: branch(0, 8)
+    :: branch(1, 3)
+    :: branch(1, 4)
+    :: branch(1, 5)
+    :: branch(1, 6)
+    :: branch(1, 7)
+    :: branch(1, 8)
+    :: branch(2, 0)
+    :: branch(2, 4)
+    :: branch(2, 5)
+    :: branch(2, 6)
+    :: branch(2, 7)
+    :: branch(2, 8)
+    :: branch(3, 0)
+    :: branch(3, 1)
+    :: branch(3, 5)
+    :: branch(3, 6)
+    :: branch(3, 7)
+    :: branch(3, 8)
+    :: branch(4, 0)
+    :: branch(4, 1)
+    :: branch(4, 2)
+    :: branch(4, 6)
+    :: branch(4, 7)
+    :: branch(4, 8)
+    :: branch(5, 0)
+    :: branch(5, 1)
+    :: branch(5, 2)
+    :: branch(5, 3)
+    :: branch(5, 7)
+    :: branch(5, 8)
+    :: branch(6, 0)
+    :: branch(6, 1)
+    :: branch(6, 2)
+    :: branch(6, 3)
+    :: branch(6, 4)
+    :: branch(6, 8)
+    :: branch(7, 0)
+    :: branch(7, 1)
+    :: branch(7, 2)
+    :: branch(7, 3)
+    :: branch(7, 4)
+    :: branch(7, 5)
+    :: branch(8, 0)
+    :: branch(8, 1)
+    :: branch(8, 2)
+    :: branch(8, 3)
+    :: branch(8, 4)
+    :: branch(8, 5)
+    :: branch(8, 6)
+    od
+}
+
+init {
+    printf("ИЗНАЧАЛЬНОЕ СОСТОЯНИЕ\\n")
+    printState();
+    run Checkers();
+}
+
+ltl { !(SAFE U GOAL); }`
+                }
+
+                return texts[filename];
             }
 
             function createExpandButton(id, text) {
@@ -256,6 +654,15 @@
                 task_solutions.id = `taskSolutions:${task_id}`;
                 task_solutions.classList.add("task-data", "restore-state");
 
+                if (Object.keys(solutions).length == 0)
+                {
+                    let warning = document.createElement("p");
+                    warning.classList.add("missing-solution-warning");
+                    warning.appendChild(document.createTextNode("Для данной задачи еще нет ни одного решения. В случае, если у вас имеется решение задачи, создайте issue в репозитории проекта или сделайте pull request согласно инструкции в репозитории."));
+                    task_solutions.appendChild(warning);
+                    return task_solutions;
+                }
+
                 let variants_row = document.createElement("div");
                 variants_row.classList.add("variants-row");
                 task_solutions.appendChild(variants_row);
@@ -306,12 +713,59 @@
                         solution.appendChild(comment);
                     }
 
+                    let solution_text = getSolutionText(filename);
+
+                    let code_container = document.createElement("div");
+                    code_container.classList.add("code-container");
+
+                    let header = document.createElement("div");
+                    header.classList.add("code-header");
+
+                    let buttons = document.createElement("div");
+                    buttons.classList.add("source-buttons");
+
+                    let header_filename = document.createElement("span");
+                    header_filename.classList.add("code-filename");
+                    header_filename.appendChild(document.createTextNode(filename));
+
+                    let copied_notification = document.createElement("span");
+                    copied_notification.classList.add("copied-notification");
+                    copied_notification.appendChild(document.createTextNode("Скопировано!"));
+
+                    let copy_button = document.createElement("button");
+                    copy_button.classList.add("source", "copy");
+                    let copy_symbol = document.createElement("i");
+                    copy_symbol.classList.add("fa", "fa-copy");
+                    copy_button.appendChild(copy_symbol);
+                    copy_button.onclick = function() {
+                        navigator.clipboard.writeText(solution_text);
+                        copied_notification.style.color = "black";
+                        setTimeout(function() { copied_notification.style.color = "transparent"; }, 3000);
+                    };
+
+                    let download_button = document.createElement("button");
+                    download_button.classList.add("source", "download");
+                    let download_symbol = document.createElement("i");
+                    download_symbol.classList.add("fa", "fa-download");
+                    download_button.appendChild(download_symbol);
+                    download_button.onclick = function() { window.location.href = `./spin/solutions/${filename}`; };
+
+                    buttons.appendChild(copy_button);
+                    buttons.appendChild(download_button);
+
+                    header.appendChild(header_filename);
+                    header.appendChild(copied_notification);
+                    header.appendChild(buttons);
+                    code_container.appendChild(header);
+
                     let code = document.createElement("code");
                     let pre = document.createElement("pre");
-                    solution.appendChild(pre);
+                    code_container.appendChild(pre);
                     pre.appendChild(code);
-                    code.appendChild(document.createTextNode(filename));
+                    code.appendChild(document.createTextNode(solution_text));
                     task_solutions.appendChild(solution);
+
+                    solution.appendChild(code_container);
                 }
 
                 return task_solutions;
@@ -332,8 +786,8 @@
 
             function placeTasks()
             {
-                let tasks = test_tasks; // getTasks();
-                let solutions = test_solutions; // getSolutions();
+                let tasks = getTasks();
+                let solutions = getSolutions();
 
                 const tasksList = document.getElementById("tasksList");
                 for (let i = 0; i < tasks.length; i++)

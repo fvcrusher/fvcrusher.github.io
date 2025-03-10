@@ -751,9 +751,19 @@ div.variants-row {
     flex-direction: row;
 }
 
+div.code-container {
+    background-color: lightgray;
+    border-radius: 5px;
+    border: solid;
+    border-width: 1px;
+    overflow: hidden;
+}
+
 pre {
     overflow: scroll;
     max-height: 40em;
+    padding: 12px;
+    margin: 0px;
 }
 
 span.pre-comment {
@@ -769,4 +779,75 @@ span.comment-body.monotype {
     font-family: monospace;
     background-color: lightgray;
     border-radius: 3px;
+}
+
+div.code-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(160, 160, 160);
+}
+
+div.source-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+
+button.source {
+    max-width: fit-content;
+    padding: 10px 20px;
+    border-radius: 0px;
+}
+
+button.source.copy {
+    background: transparent;
+}
+
+button.source.copy:hover {
+    background: #8f8f8f;
+}
+
+button.source.copy:active {
+    background: #808080;
+    transition: none;
+}
+
+button.source.download {
+    background-color: #5cff00;
+}
+
+button.source.download:hover {
+    background-color: #53dd03;
+}
+
+button.source.download:active {
+    background-color: #43b800;
+    transition: none;
+}
+
+span.code-filename {
+    margin: auto 0px;
+    padding: 0px 10px;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+span.copied-notification {
+    margin: auto 0px;
+    padding: 0px 10px;
+    color: transparent;
+    cursor: default;
+    user-select: none;
+    transition: color 0.3s;
+}
+
+p.missing-solution-warning {
+    background-color: lightpink;
+    margin: 0px;
+    padding: 20px;
+    border-radius: 10px;
+    border: solid;
+    border-width: 2px;
+    border-color: red;
 }
