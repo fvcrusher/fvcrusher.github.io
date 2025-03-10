@@ -715,3 +715,58 @@ span.task-buttons {
     justify-content: left;
     gap: 20px;
 }
+
+div.solution-text {
+    display: none;
+    padding: 10px;
+}
+
+div.solution-text.open {
+    display: block;
+}
+
+button.solution-variant {
+    padding: 5px 10px;
+    max-width: max-content;
+    background-color: transparent;
+    border-radius: 0px;
+}
+
+button.solution-variant:hover {
+    background-color: lightgray;
+}
+
+button.solution-variant:active {
+    background-color: rgb(165, 165, 165);
+    transition: none;
+}
+
+button.solution-variant.opened {
+    text-decoration: underline;
+}
+
+div.variants-row {
+    overflow-y: scroll; 
+    display: flex; 
+    flex-direction: row;
+}
+
+pre {
+    overflow: scroll;
+    max-height: 40em;
+}
+
+span.pre-comment {
+    font-weight: bold;
+}
+
+span.comment-body {
+    font-style: italic;
+}
+
+span.comment-body.monotype {
+    font-style: normal;
+    font-family: monospace;
+    background-color: lightgray;
+    border-radius: 3px;
+}

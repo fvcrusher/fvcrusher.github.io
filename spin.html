@@ -20,6 +20,11 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
 </head>
 <body>
     <header>
@@ -78,11 +83,44 @@
                     }
                 }
 
+                function closeSolutions(task_no = null)
+                {
+                    let solutions = document.getElementsByClassName("solution-text");
+                    for (let i = 0; i < solutions.length; i++)
+                    {
+                        if (task_no == null || solutions[i].id.split(":")[1] == task_no)
+                            solutions[i].classList.remove("open");
+                    }
+                    let variant_buttons = document.getElementsByClassName("solution-variant");
+                    for (let i = 0; i < variant_buttons.length; i++)
+                    {
+                        if (task_no == null || variant_buttons[i].id.split(":")[1] == task_no)
+                            variant_buttons[i].classList.remove("opened");
+                    }
+                }
+
+                function openSolution(button)
+                {
+                    let [action, task_no, solution_no] = button.id.split(":");
+                        closeSolutions(task_no);
+
+                    button.classList.add("opened");
+                    let solution_id = `solution:${task_no}:${solution_no}`;
+                    let to_expand = `taskSolutions:${task_no}`;
+                    const solution = document.getElementById(solution_id);
+                    const solution_container = document.getElementById(to_expand);
+
+                    solution.classList.add("open");
+
+                    solution_container.style.setProperty("max-height", `${solution_container.scrollHeight}px`);
+                }
+
                 function expandTask(button)
                 {
                     let [action, no] = button.id.split(":");
                     let task_id = `task:${no}`;
                     let expandable_id = `${(action == "expandTask") ? "taskText" : "taskSolutions"}:${no}`;
+                    let default_solution_button = document.getElementById(`openSolution:${no}:1`);
 
                     const arrow = button.getElementsByClassName("dropdown-arrow")[0];
                     const task_header = document.getElementById(task_id);
@@ -94,6 +132,8 @@
 
                     if (opening)
                     {
+                        if (action == "expandSolutions" && default_solution_button != null)
+                            openSolution(default_solution_button);
                         arrow.classList.add("up");
                         task_header.classList.add("expanded");
                         to_expand.classList.add("open");
@@ -121,6 +161,34 @@
                     "task": "Даны три стержня, на один из которых нанизаны 8 (в общем случае 𝑁) колец. Кольца отличаются размером и лежат меньшее на большем. Задача состоит в том, чтобы перенести пирамиду из колец на другой стержень. За один раз разрешается переносить только одно кольцо, причем нельзя класть большее кольцо на меньшее."
                 }
             ]
+
+            const test_solutions = {
+                "4.pml": {
+                    "task_id": "jealous_couples_2024",
+                    "startup_cmd": "spin -t -run 4.pml",
+                    "comment": "Решение автора fvcrusher"
+                },
+                "7.pml": {
+                    "task_id": "fear_of_the_dark_2024",
+                    "startup_cmd": "",
+                    "comment": "Решение автора fvcrusher"
+                },
+                "8.pml": {
+                    "task_id": "tower_of_hanoi_2024",
+                    "startup_cmd": "",
+                    "comment": "Решение автора fvcrusher"
+                },
+                "9.pml": {
+                    "task_id": "fear_of_the_dark_2024",
+                    "startup_cmd": "",
+                    "comment": "Похоже, что решение верное, но проверить не удалось - не хватило ресурсов для обсчета, spin уехал в swap"
+                },
+                "16.pml": {
+                    "task_id": "tower_of_hanoi_2024",
+                    "startup_cmd": "",
+                    "comment": "Альтернатива для перебора всех возможных перестановок в do-od - использование rand() или select() (читайте в манах на spin). Однако использование этих операторов значительно повышает расходы ресурсов и время обсчета задачи. Если у вас мощный ПК, можете использовать альтернативное решение с использованием select()."
+                }
+            }
 
             function getTasks()
             {
@@ -181,31 +249,98 @@
                 return task_text;
             }
 
-            function createTaskSolutions(solution, task_id)
+            // solutions - dict: {<filename> : {"startup_cmd": <startup_cmd>, "comment": <comment>}, ...}
+            function createTaskSolutions(solutions, task_id)
             {
-                let task_text = document.createElement("div");
-                task_text.id = `taskSolutions:${task_id}`;
-                task_text.classList.add("task-data", "restore-state");
+                let task_solutions = document.createElement("div");
+                task_solutions.id = `taskSolutions:${task_id}`;
+                task_solutions.classList.add("task-data", "restore-state");
 
-                // Replace with correct solution placing
-                task_text.appendChild(document.createTextNode("Здесь будет решение задачи"));
+                let variants_row = document.createElement("div");
+                variants_row.classList.add("variants-row");
+                task_solutions.appendChild(variants_row);
 
-                return task_text;
+                let counter = 0;
+                for (let filename in solutions)
+                {
+                    let button = document.createElement("button");
+                    button.id = `openSolution:${task_id}:${++counter}`;
+                    button.classList.add("solution-variant");
+                    button.onclick = function() { openSolution(button); };
+                    button.textContent = filename;
+                    variants_row.appendChild(button);
+
+                    let solution = document.createElement("div");
+                    solution.id = `solution:${task_id}:${counter}`;
+                    solution.classList.add("solution-text");
+
+                    if (solutions[filename].comment.length != 0)
+                    {
+                        let comment = document.createElement("p");
+                        let pre_comment = document.createElement("span");
+                        pre_comment.classList.add("pre-comment");
+                        let comment_body = document.createElement("span");
+                        comment_body.classList.add("comment-body");
+
+                        pre_comment.appendChild(document.createTextNode("Комментарий автора: "));
+                        comment_body.appendChild(document.createTextNode(solutions[filename].comment));
+                        comment.appendChild(pre_comment);
+                        comment.appendChild(comment_body);
+
+                        solution.appendChild(comment);
+                    }
+
+                    if (solutions[filename].startup_cmd.length != 0)
+                    {
+                        let comment = document.createElement("p");
+                        let pre_comment = document.createElement("span");
+                        pre_comment.classList.add("pre-comment");
+                        let comment_body = document.createElement("span");
+                        comment_body.classList.add("comment-body", "monotype");
+
+                        pre_comment.appendChild(document.createTextNode("Команда запуска spin: "));
+                        comment_body.appendChild(document.createTextNode(solutions[filename].startup_cmd));
+                        comment.appendChild(pre_comment);
+                        comment.appendChild(comment_body);
+
+                        solution.appendChild(comment);
+                    }
+
+                    let code = document.createElement("code");
+                    let pre = document.createElement("pre");
+                    solution.appendChild(pre);
+                    pre.appendChild(code);
+                    code.appendChild(document.createTextNode(filename));
+                    task_solutions.appendChild(solution);
+                }
+
+                return task_solutions;
+            }
+
+            function filter(dict, predicate)
+            {
+                let result = {};
+                
+                for (let key in dict)
+                {
+                    if (predicate(key, dict[key]))
+                        result[key] = dict[key];
+                }
+
+                return result;
             }
 
             function placeTasks()
             {
                 let tasks = test_tasks; // getTasks();
-
-                for (let i = 0; i < 500000; i++)
-                    console.log(1);
+                let solutions = test_solutions; // getSolutions();
 
                 const tasksList = document.getElementById("tasksList");
                 for (let i = 0; i < tasks.length; i++)
                 {
                     tasksList.appendChild(createTask(tasks[i].name, i));
                     tasksList.appendChild(createTaskText(tasks[i].task, i));
-                    tasksList.appendChild(createTaskSolutions("Решение", i));
+                    tasksList.appendChild(createTaskSolutions(filter(solutions, (key, value) => value.task_id == tasks[i].id), i));
                 }
 
                 tasksList.removeChild(document.getElementById("loaderProcess"));
@@ -213,6 +348,7 @@
 
             setTimeout(placeTasks, 0);
         </script>
+        <!-- <script>hljs.highlightAll();</script> -->
     </main>
     <footer>
         <div class="footer-container">
