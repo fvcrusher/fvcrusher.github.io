@@ -674,11 +674,13 @@ p.task-header {
     display: flex;
     flex-direction: column;
     justify-content: start;
-    background-color: cyan;
+    background-color: lightgray;
     border-radius: 10px;
     margin-bottom: 0px;
     padding: 10px;
     gap: 5px;
+    border: solid;
+    border-width: 1px;
     transition: all 0.3s;
 }
 
@@ -691,12 +693,15 @@ div.task-data {
     overflow-x: hidden;
     margin-top: 0px;
     padding: 0px 10px 0px 10px;
-    background-color: gray;
     border-radius: 0px 0px 10px 10px;
+    border: solid;
+    border-width: 0px 1px 0px 1px;
     transition: all 0.3s;
 }
 
 div.task-data.open {
+    border: solid;
+    border-width: 0px 1px 1px 1px;
     padding: 10px;
 }
 
