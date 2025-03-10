@@ -12,9 +12,7 @@
  *   9) С непустой 3 на пустую 1
  */
 
-// time spin -run -i 8.pml --> 68.8 sec
-
-#define N 8
+#define N 3
 
 byte rod1[N], rod2[N], rod3[N] = 0;
 byte rod1_idx, rod2_idx, rod3_idx = 0;

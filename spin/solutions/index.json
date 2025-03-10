@@ -1,27 +1,27 @@
 {
     "4.pml": {
         "task_id": "jealous_couples_2024",
-        "startup_cmd": "",
-        "comment": "Решение автора fvcrusher"
+        "startup_cmd": "spin -run -i 4.pml",
+        "comment": "Возможно для этой задачи есть и более элегантное решение, но это работает более чем прекрасно"
     },
     "7.pml": {
         "task_id": "fear_of_the_dark_2024",
-        "startup_cmd": "",
-        "comment": "Решение автора fvcrusher"
+        "startup_cmd": "spin -run -i 7.pml",
+        "comment": ""
     },
     "8.pml": {
         "task_id": "tower_of_hanoi_2024",
-        "startup_cmd": "",
-        "comment": "Решение автора fvcrusher"
+        "startup_cmd": "spin -run -i 8.pml",
+        "comment": "Для N = 8 (меняется с помощью #define в начале кода) spin находит решение примерно за 68.8 секунд на Core i7 11gen + 16Gb RAM. Для больших N время и затраты оперативки значительно возрастают, не удалось проверить, но должно работать правильно"
     },
     "9.pml": {
         "task_id": "knights_walk_around_the_chessboard_2024",
-        "startup_cmd": "",
+        "startup_cmd": "spin -run -i 9.pml",
         "comment": "Похоже, что решение верное, но проверить не удалось - не хватило ресурсов для обсчета, spin уехал в swap"
     },
     "16.pml": {
         "task_id": "six_checkers_2024",
-        "startup_cmd": "",
+        "startup_cmd": "spin -run -i 16.pml",
         "comment": "Альтернатива для перебора всех возможных перестановок в do-od - использование rand() или select() (читайте в манах на spin). Однако использование этих операторов значительно повышает расходы ресурсов и время обсчета задачи. Если у вас мощный ПК, можете использовать альтернативное решение с использованием select()."
     }
 }

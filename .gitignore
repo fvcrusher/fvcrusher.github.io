@@ -1,2 +1,5 @@
 *.txt
 .vscode
+*.tmp
+*.trail
+pan

@@ -93,7 +93,11 @@ inline move(i, j) {
 
 
 // Веток много - сделаем дефайн для простоты
-#define branch(i, j) (canMove(i, j)) -> atomic { printf("ШАГ %d: Двигаем шашки с мест %d и %d на места %d и %d\n", steps+1, i, i+1, j, j+1); move(i, j); printState(); }
+#define branch(i, j) (canMove(i, j)) -> atomic { \
+    printf( \
+        "ШАГ %d: Двигаем шашки с мест %d и %d на места %d и %d\n", \
+        steps+1, i, i+1, j, j+1 \
+    ); move(i, j); printState(); }
 
 
 proctype Checkers() {
