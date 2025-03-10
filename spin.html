@@ -63,11 +63,12 @@
         </div>
     </header>
     <main>
+        <p id="loaderProcess" class="loader-process">
+            <span class="loader-message">Задачи загружаются, подождите пожалуйста</span>
+            <span class="loader"></span>
+        </p>
         <div id="tasksList" class="spin-tasks">
-            <p id="loaderProcess" class="loader-process">
-                <span class="loader-message">Задачи загружаются, подождите пожалуйста</span>
-                <span class="loader"></span>
-            </p>
+            
             <script>
                 function restoreAll()
                 {
@@ -141,22 +142,19 @@
             </script>
         </div>
         <script>
-            function getTasks()
+            async function getTasks()
             {
-                fetch("./spin/tasks.json")
-                    .then(response => function() { return response.json(); });
+                return (await fetch("./spin/tasks.json")).json();
             }
 
-            function getSolutions()
+            async function getSolutions()
             {
-                fetch("./spin/solutions/index.json")
-                    .then(response => function() { return response.json(); });
+                return (await fetch("./spin/solutions/index.json")).json();
             }
 
-            function getSolutionText(filename)
+            async function getSolutionText(filename)
             {
-                fetch(`./spin/solutions/${filename}`)
-                    .then(response => function() { return response; });
+                return (await fetch(`./spin/solutions/${filename}`)).text();
             }
 
             function createExpandButton(id, text) {
@@ -212,7 +210,7 @@
             }
 
             // solutions - dict: {<filename> : {"startup_cmd": <startup_cmd>, "comment": <comment>}, ...}
-            function createTaskSolutions(solutions, task_id)
+            async function createTaskSolutions(solutions, task_id)
             {
                 let task_solutions = document.createElement("div");
                 task_solutions.id = `taskSolutions:${task_id}`;
@@ -277,7 +275,7 @@
                         solution.appendChild(comment);
                     }
 
-                    let solution_text = getSolutionText(filename);
+                    let solution_text = await getSolutionText(filename);
 
                     let code_container = document.createElement("div");
                     code_container.classList.add("code-container");
@@ -348,20 +346,21 @@
                 return result;
             }
 
-            function placeTasks()
+            async function placeTasks()
             {
-                let tasks = getTasks();
-                let solutions = getSolutions();
+                let tasks = await getTasks();
+                let solutions = await getSolutions();
 
                 const tasksList = document.getElementById("tasksList");
                 for (let i = 0; i < tasks.length; i++)
                 {
                     tasksList.appendChild(createTask(tasks[i].name, i));
                     tasksList.appendChild(createTaskText(tasks[i].task, i));
-                    tasksList.appendChild(createTaskSolutions(filter(solutions, (key, value) => value.task_id == tasks[i].id), i));
+                    tasksList.appendChild(await createTaskSolutions(filter(solutions, (key, value) => value.task_id == tasks[i].id), i));
                 }
 
-                tasksList.removeChild(document.getElementById("loaderProcess"));
+                document.getElementById("loaderProcess").remove();
+                tasksList.style.display = "block";
             }
 
             setTimeout(placeTasks, 0);

@@ -364,6 +364,7 @@ ul {
     font-size: 1em;
     color: #333;
     text-align: left;
+    display: none;
 }
 
 @media (min-width: 601px) 
