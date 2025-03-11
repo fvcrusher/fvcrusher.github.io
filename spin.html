@@ -198,17 +198,17 @@
         <script>
             async function getTasks()
             {
-                return (await fetch("./spin/tasks.json")).json();
+                return (await fetch("./spin_database/tasks.json")).json();
             }
 
             async function getSolutions()
             {
-                return (await fetch("./spin/solutions/index.json")).json();
+                return (await fetch("./spin_database/solutions/index.json")).json();
             }
 
             async function getSolutionText(filename)
             {
-                return (await fetch(`./spin/solutions/${filename}`)).text();
+                return (await fetch(`./spin_database/solutions/${filename}`)).text();
             }
 
             function createExpandButton(id, text) {
@@ -292,8 +292,12 @@
                 {
                     let warning = document.createElement("p");
                     warning.classList.add("missing-solution-warning");
-                    warning.appendChild(document.createTextNode("Для данной задачи еще нет ни одного решения. В случае, если у вас имеется решение задачи, создайте issue в репозитории проекта или сделайте pull request согласно инструкции в репозитории."));
+                    warning.appendChild(document.createTextNode("Для данной задачи еще нет ни одного решения. В случае, если у вас имеется решение задачи, создайте issue в репозитории проекта или сделайте pull request согласно "));
                     task_solutions.appendChild(warning);
+                    let instruction = document.createElement("a");
+                    instruction.href = "../spin_database";
+                    instruction.appendChild(document.createTextNode("инструкции"))
+                    warning.appendChild(instruction);
                     return task_solutions;
                 }
 
@@ -392,7 +396,7 @@
                     let download_symbol = document.createElement("i");
                     download_symbol.classList.add("fa-solid", "fa-download");
                     download_button.appendChild(download_symbol);
-                    download_button.onclick = function() { window.location.href = `./spin/solutions/${filename}`; };
+                    download_button.onclick = function() { window.location.href = `./spin_database/solutions/${filename}`; };
 
                     buttons.appendChild(copy_button);
                     buttons.appendChild(download_button);
