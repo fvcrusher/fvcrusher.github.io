@@ -31,7 +31,7 @@
     },
     "16_select.pml": {
         "task_id": "six_checkers_2024",
-        "startup_cmd": "spin -run -i -a 16.pml",
+        "startup_cmd": "spin -run -i -a 16_select.pml",
         "comment": "Вариант с использованием оператора select, вроде работает, но лучше конечно перепроверить."
     },
 

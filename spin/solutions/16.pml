@@ -32,7 +32,7 @@ int first_black = 4;
 byte steps = 0;
 
 #define SAFE steps < 3
-#define GOAL last_white < first_black
+#define GOAL (last_white < first_black && steps == 3)
 
 
 // Для удобства чтения полученного решения загадки
