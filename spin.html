@@ -346,17 +346,44 @@
                 return result;
             }
 
+            function empty(dict)
+            {
+                return Object.keys(dict).length == 0;
+            }
+
             async function placeTasks()
             {
                 let tasks = await getTasks();
                 let solutions = await getSolutions();
 
                 const tasksList = document.getElementById("tasksList");
+
+                let solved_tasks_container = document.createElement("div");
+                solved_tasks_container.classList.add("task-container");
+                solved_tasks_container.id = "solvedTasks";
+
+                let unsolved_tasks_container = document.createElement("div");
+                unsolved_tasks_container.classList.add("task-container");
+                unsolved_tasks_container.id = "unsolvedTasks";
+
+                tasksList.appendChild(solved_tasks_container);
+                tasksList.appendChild(unsolved_tasks_container);
+
                 for (let i = 0; i < tasks.length; i++)
                 {
-                    tasksList.appendChild(createTask(tasks[i].name, i));
-                    tasksList.appendChild(createTaskText(tasks[i].task, i));
-                    tasksList.appendChild(await createTaskSolutions(filter(solutions, (key, value) => value.task_id == tasks[i].id), i));
+                    let filtered_solutions = filter(solutions, (key, value) => value.task_id == tasks[i].id);
+
+                    let task_container = document.createElement("div");
+                    task_container.classList.add("task-container", "singular");
+                    task_container.id = `taskContainer:${i}`;
+                    task_container.appendChild(createTask(tasks[i].name, i));
+                    task_container.appendChild(createTaskText(tasks[i].task, i));
+                    task_container.appendChild(await createTaskSolutions(filtered_solutions, i));
+
+                    if (empty(filtered_solutions))
+                        unsolved_tasks_container.appendChild(task_container);
+                    else
+                        solved_tasks_container.appendChild(task_container);
                 }
 
                 document.getElementById("loaderProcess").remove();
