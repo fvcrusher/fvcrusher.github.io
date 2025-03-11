@@ -869,3 +869,43 @@ i.no-solution-check {
     color: red;
     margin-left: 5px;
 }
+
+.filter-container {
+    display: flex; 
+    flex-direction: row; 
+    border-radius: 5px; 
+    overflow: hidden; 
+    max-height: min-content;
+    border: solid;
+    background-color: whitesmoke;
+    border-width: 1px;
+    max-width: 20em;
+    margin-left: auto;
+}
+
+button.search {
+    max-width: max-content; 
+    border-radius: 0px; 
+    padding: 5px;
+    height: 100%;
+    background-color: transparent;
+    z-index: 1;
+}
+
+button.search:hover {
+    background-color: lightgray;
+}
+
+button.search.regex.active {
+    background-color: rgb(167, 167, 167);
+}
+
+input.filter {
+    border-radius: 0px; 
+    border: none;
+    margin: 0px;
+    padding: 5px;
+    z-index: 0;
+    background-color: transparent;
+    outline: none;
+}

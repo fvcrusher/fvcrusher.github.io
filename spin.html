@@ -68,7 +68,61 @@
             <span class="loader"></span>
         </p>
         <div id="tasksList" class="spin-tasks">
-            
+            <div class="filter-container">
+                <button id="toggleRegexButton" onclick="toggleRegexFilter()" class="search regex" title="Поиск с помощью регулярного выражения">r"</button>
+                <input type="text" id="filterValue" placeholder="Фильтровать задачи..." class="filter">
+                <!-- <button id="filterButton" onclick="filterTasks()" class="search filter">Se</button> -->
+                <script>
+                    function toggleRegexFilter() {
+                        document.getElementById("toggleRegexButton").classList.toggle("active");
+                        filterTasks();
+                    }
+
+                    function emptyString(str) {
+                        return str.match(/^\s*$/gm) != null;
+                    }
+
+                    function satisfiesFilter(node, regex_mode, filter_str) {
+                        if (regex_mode)
+                            return node.textContent.toLowerCase().match(RegExp(filter_str, "gm")) != null;
+                        else
+                            return node.textContent.toLowerCase().includes(filter_str);
+                    }
+
+                    function filterTasksInContainer(container, regex_mode, filter_str) {
+                        let tasks = container.getElementsByClassName("task-container");
+                        
+                        let shown_count = 0;
+                        for (let i = 0; i < tasks.length; i++)
+                        {
+                            if (emptyString(filter_str) || satisfiesFilter(tasks[i], regex_mode, filter_str))
+                            {
+                                tasks[i].style.removeProperty("display");
+                                shown_count++;
+                            }
+                            else
+                                tasks[i].style.setProperty("display", "none");
+                        }
+
+                        if (shown_count == 0)
+                            container.style.setProperty("display", "none");
+                        else
+                            container.style.removeProperty("display");
+                    }
+
+                    function filterTasks() {
+                        const regexMode = document.getElementById("toggleRegexButton") == null ? false : document.getElementById("toggleRegexButton").classList.contains("active");
+                        let filter_str = document.getElementById("filterValue").value;
+                        if (!regexMode)
+                            filter_str = filter_str.toLowerCase().trim();
+
+                        filterTasksInContainer(document.getElementById("solvedTasks"), regexMode, filter_str);
+                        filterTasksInContainer(document.getElementById("unsolvedTasks"), regexMode, filter_str);
+                    }
+
+                    document.getElementById("filterValue").addEventListener("input", filterTasks);
+                </script>
+            </div>
             <script>
                 function restoreAll()
                 {
