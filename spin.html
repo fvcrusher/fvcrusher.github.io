@@ -361,13 +361,21 @@
                 let solved_tasks_container = document.createElement("div");
                 solved_tasks_container.classList.add("task-container");
                 solved_tasks_container.id = "solvedTasks";
+                let solved_tasks_container_header = document.createElement("p");
+                solved_tasks_container_header.classList.add("task-container-header");
+                solved_tasks_container_header.appendChild(document.createTextNode("Решенные задачи"));
+                solved_tasks_container.appendChild(solved_tasks_container_header);
 
                 let unsolved_tasks_container = document.createElement("div");
                 unsolved_tasks_container.classList.add("task-container");
                 unsolved_tasks_container.id = "unsolvedTasks";
+                let unsolved_tasks_container_header = document.createElement("p");
+                unsolved_tasks_container_header.classList.add("task-container-header");
+                unsolved_tasks_container_header.appendChild(document.createTextNode("Нерешенные задачи"));
+                unsolved_tasks_container.appendChild(unsolved_tasks_container_header);
 
-                tasksList.appendChild(solved_tasks_container);
-                tasksList.appendChild(unsolved_tasks_container);
+                let unsolved_count = 0;
+                let solved_count = 0;
 
                 for (let i = 0; i < tasks.length; i++)
                 {
@@ -381,10 +389,21 @@
                     task_container.appendChild(await createTaskSolutions(filtered_solutions, i));
 
                     if (empty(filtered_solutions))
+                    {
                         unsolved_tasks_container.appendChild(task_container);
+                        unsolved_count++;
+                    }
                     else
+                    {
                         solved_tasks_container.appendChild(task_container);
+                        solved_count++;
+                    }
                 }
+
+                if (solved_count > 0)
+                    tasksList.appendChild(solved_tasks_container);
+                if (unsolved_count > 0)
+                    tasksList.appendChild(unsolved_tasks_container);
 
                 document.getElementById("loaderProcess").remove();
                 tasksList.style.display = "block";

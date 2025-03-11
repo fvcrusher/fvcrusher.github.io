@@ -852,3 +852,9 @@ p.missing-solution-warning {
     border-width: 2px;
     border-color: red;
 }
+
+p.task-container-header {
+    text-align: center;
+    text-decoration: underline;
+    font-size: large;
+}
