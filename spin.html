@@ -22,7 +22,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
     <header>
@@ -172,7 +172,7 @@
                 return button;
             }
 
-            function createTask(task_name, task_id)
+            function createTask(task_name, task_id, has_solution=null, has_approved_solution=null)
             {
                 let task = document.createElement("p");
                 task.id = `task:${task_id}`;
@@ -182,6 +182,24 @@
                 task.appendChild(name);
                 name.classList.add("task-name");
                 name.appendChild(document.createTextNode(task_name));
+
+                if (has_solution != null && !has_solution) {
+                    let no_solution_sign = document.createElement("i");
+                    no_solution_sign.classList.add("fa-solid", "fa-circle-xmark", "no-solution-check");
+                    no_solution_sign.title = "Решений этой задачи пока нет";
+                    name.appendChild(no_solution_sign);
+                    task.classList.add("no-solution");
+                }
+                
+                else if (
+                    has_solution != null && has_solution &&
+                    has_approved_solution != null && has_approved_solution
+                ) {
+                    let approve_sign = document.createElement("i");
+                    approve_sign.classList.add("fa-solid", "fa-circle-check", "approved-check");
+                    approve_sign.title = "Есть проверенное решение";
+                    name.appendChild(approve_sign);
+                }
 
                 let buttons = document.createElement("span");
                 task.appendChild(buttons);
@@ -238,6 +256,14 @@
                     button.onclick = function() { openSolution(button); };
                     button.textContent = filename;
                     variants_row.appendChild(button);
+
+                    if (solutions[filename].accepted)
+                    {
+                        let approve_sign = document.createElement("i");
+                        approve_sign.classList.add("fa-solid", "fa-circle-check", "approved-check");
+                        approve_sign.title = "Проверенное решение";
+                        button.appendChild(approve_sign);
+                    }
 
                     let solution = document.createElement("div");
                     solution.id = `solution:${task_id}:${counter}`;
@@ -296,8 +322,9 @@
 
                     let copy_button = document.createElement("button");
                     copy_button.classList.add("source", "copy");
+                    copy_button.title = "Скопировать код в буфер обмена";
                     let copy_symbol = document.createElement("i");
-                    copy_symbol.classList.add("fa", "fa-copy");
+                    copy_symbol.classList.add("fa-solid", "fa-copy");
                     copy_button.appendChild(copy_symbol);
                     copy_button.onclick = function() {
                         navigator.clipboard.writeText(solution_text);
@@ -307,8 +334,9 @@
 
                     let download_button = document.createElement("button");
                     download_button.classList.add("source", "download");
+                    download_button.title = "Скачать код";
                     let download_symbol = document.createElement("i");
-                    download_symbol.classList.add("fa", "fa-download");
+                    download_symbol.classList.add("fa-solid", "fa-download");
                     download_button.appendChild(download_symbol);
                     download_button.onclick = function() { window.location.href = `./spin/solutions/${filename}`; };
 
@@ -351,6 +379,19 @@
                 return Object.keys(dict).length == 0;
             }
 
+            function any(dict, predicate)
+            {
+                let result = false;
+
+                for (key in dict)
+                {
+                    if (predicate(key, dict[key]))
+                        result |= true;
+                }
+
+                return result;
+            }
+
             async function placeTasks()
             {
                 let tasks = await getTasks();
@@ -380,23 +421,25 @@
                 for (let i = 0; i < tasks.length; i++)
                 {
                     let filtered_solutions = filter(solutions, (key, value) => value.task_id == tasks[i].id);
+                    let solution_exist = !empty(filtered_solutions);
+                    let has_approved_solution = any(filtered_solutions, (key, value) => value.accepted);
 
                     let task_container = document.createElement("div");
                     task_container.classList.add("task-container", "singular");
                     task_container.id = `taskContainer:${i}`;
-                    task_container.appendChild(createTask(tasks[i].name, i));
+                    task_container.appendChild(createTask(tasks[i].name, i, solution_exist, has_approved_solution));
                     task_container.appendChild(createTaskText(tasks[i].task, i));
                     task_container.appendChild(await createTaskSolutions(filtered_solutions, i));
 
-                    if (empty(filtered_solutions))
-                    {
-                        unsolved_tasks_container.appendChild(task_container);
-                        unsolved_count++;
-                    }
-                    else
+                    if (solution_exist)
                     {
                         solved_tasks_container.appendChild(task_container);
                         solved_count++;
+                    }
+                    else
+                    {
+                        unsolved_tasks_container.appendChild(task_container);
+                        unsolved_count++;
                     }
                 }
 

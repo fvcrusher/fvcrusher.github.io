@@ -857,4 +857,15 @@ p.task-container-header {
     text-align: center;
     text-decoration: underline;
     font-size: large;
+    font-weight: bold;
+}
+
+i.approved-check {
+    color: green;
+    margin-left: 5px;
+}
+
+i.no-solution-check {
+    color: red;
+    margin-left: 5px;
 }
