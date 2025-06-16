@@ -23,6 +23,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script>
+        let CParser = null;
+        import("./Lib/c_source.js").then((mod) => CParser = mod);
+    </script>
 </head>
 <body>
     <header>
@@ -177,7 +181,7 @@
                     let [action, no] = button.id.split(":");
                     let task_id = `task:${no}`;
                     let expandable_id = `${(action == "expandTask") ? "taskText" : "taskSolutions"}:${no}`;
-                    let default_solution_button = document.getElementById(`openSolution:${no}:1`);
+                    let default_solution_button = document.getElementById(`openSolution:${no}:0`);
 
                     const arrow = button.getElementsByClassName("dropdown-arrow")[0];
                     const task_header = document.getElementById(task_id);
@@ -200,19 +204,9 @@
             </script>
         </div>
         <script>
-            async function getTasks()
-            {
-                return (await fetch("./framac_database/tasks/index.json")).json();
-            }
-
-            async function getTaskText(filename)
-            {
-                return (await fetch(`./framac_database/tasks/${filename}`)).text();
-            }
-
             async function getSolutions()
             {
-                return (await fetch("./framac_database/solutions/index.json")).json();
+                return (await fetch("./framac_database/index.json")).json();
             }
 
             async function getSolutionText(filename)
@@ -235,29 +229,19 @@
                 return button;
             }
 
-            function createTask(task_name, task_id, has_solution=null, has_approved_solution=null)
+            function createTask(task_name, has_approved_solution=null)
             {
                 let task = document.createElement("p");
-                task.id = `task:${task_id}`;
+                task.id = `task:${task_name}`;
                 task.classList.add("task-header", "restore-state");
 
                 let name = document.createElement("span");
                 task.appendChild(name);
                 name.classList.add("task-name");
                 name.appendChild(document.createTextNode(task_name));
-
-                if (has_solution != null && !has_solution) {
-                    let no_solution_sign = document.createElement("i");
-                    no_solution_sign.classList.add("fa-solid", "fa-circle-xmark", "no-solution-check");
-                    no_solution_sign.title = "Решений этой задачи пока нет";
-                    name.appendChild(no_solution_sign);
-                    task.classList.add("no-solution");
-                }
                 
-                else if (
-                    has_solution != null && has_solution &&
-                    has_approved_solution != null && has_approved_solution
-                ) {
+                if (has_approved_solution != null && has_approved_solution) 
+                {
                     let approve_sign = document.createElement("i");
                     approve_sign.classList.add("fa-solid", "fa-circle-check", "approved-check");
                     approve_sign.title = "Есть проверенное решение";
@@ -268,18 +252,16 @@
                 task.appendChild(buttons);
                 buttons.classList.add("task-buttons");
 
-                let text_button = createExpandButton(`expandTask:${task_id}`, "Условие");
+                let text_button = createExpandButton(`expandTask:${task_name}`, "Условие");
                 buttons.appendChild(text_button);
-                let solutions_button = createExpandButton(`expandSolutions:${task_id}`, "Решения");
+                let solutions_button = createExpandButton(`expandSolutions:${task_name}`, "Решения");
                 buttons.appendChild(solutions_button);
 
                 return task;
             }
 
-            async function createTaskText(filename, task_id)
+            function createTaskText(solution_text, task_id)
             {
-                let solution_text = await getTaskText(filename);
-
                 let code_container = document.createElement("div");
                 code_container.classList.add("code-container");
 
@@ -288,10 +270,6 @@
 
                 let buttons = document.createElement("div");
                 buttons.classList.add("source-buttons");
-
-                let header_filename = document.createElement("span");
-                header_filename.classList.add("code-filename");
-                header_filename.appendChild(document.createTextNode(filename));
 
                 let copied_notification = document.createElement("span");
                 copied_notification.classList.add("copied-notification");
@@ -309,18 +287,8 @@
                     setTimeout(function() { copied_notification.style.color = "transparent"; }, 3000);
                 };
 
-                let download_button = document.createElement("button");
-                download_button.classList.add("source", "download");
-                download_button.title = "Скачать код";
-                let download_symbol = document.createElement("i");
-                download_symbol.classList.add("fa-solid", "fa-download");
-                download_button.appendChild(download_symbol);
-                download_button.onclick = function() { window.location.href = `./framac_database/tasks/${filename}`; };
-
                 buttons.appendChild(copy_button);
-                buttons.appendChild(download_button);
 
-                header.appendChild(header_filename);
                 header.appendChild(copied_notification);
                 header.appendChild(buttons);
                 code_container.appendChild(header);
@@ -339,41 +307,39 @@
                 return task_text;
             }
 
-            // solutions - dict: {<filename> : {"strategy": <strategy>, "comment": <comment>}, ...}
-            async function createTaskSolutions(solutions, task_id)
+            /* solutions - list: 
+             * [
+             *   {
+             *     "source": <CSource object>, 
+             *     "strategy": <string>, 
+             *     "comment": <string>, 
+             *     "filename": <string>, 
+             *     "accepted": bool
+             *   }, 
+             *   ...
+             * ]
+             */
+            function createTaskSolutions(solutions, task_id)
             {
                 let task_solutions = document.createElement("div");
                 task_solutions.id = `taskSolutions:${task_id}`;
                 task_solutions.classList.add("task-data", "restore-state");
 
-                if (Object.keys(solutions).length == 0)
-                {
-                    let warning = document.createElement("p");
-                    warning.classList.add("missing-solution-warning");
-                    warning.appendChild(document.createTextNode("Для данной задачи еще нет ни одного решения. В случае, если у вас имеется решение задачи, создайте issue в репозитории проекта или сделайте pull request согласно "));
-                    task_solutions.appendChild(warning);
-                    let instruction = document.createElement("a");
-                    instruction.href = "../spin_database";
-                    instruction.appendChild(document.createTextNode("инструкции"))
-                    warning.appendChild(instruction);
-                    return task_solutions;
-                }
-
                 let variants_row = document.createElement("div");
                 variants_row.classList.add("variants-row");
                 task_solutions.appendChild(variants_row);
 
-                let counter = 0;
-                for (let filename in solutions)
+                for (let idx = 0; idx < solutions.length; idx++)
                 {
+                    let solution = solutions[idx];
                     let button = document.createElement("button");
-                    button.id = `openSolution:${task_id}:${++counter}`;
+                    button.id = `openSolution:${task_id}:${idx}`;
                     button.classList.add("solution-variant");
                     button.onclick = function() { openSolution(button); };
-                    button.textContent = filename;
+                    button.textContent = solution.filename;
                     variants_row.appendChild(button);
 
-                    if (solutions[filename].accepted)
+                    if (solution.accepted)
                     {
                         let approve_sign = document.createElement("i");
                         approve_sign.classList.add("fa-solid", "fa-circle-check", "approved-check");
@@ -381,11 +347,11 @@
                         button.appendChild(approve_sign);
                     }
 
-                    let solution = document.createElement("div");
-                    solution.id = `solution:${task_id}:${counter}`;
-                    solution.classList.add("solution-text");
+                    let solution_div = document.createElement("div");
+                    solution_div.id = `solution:${task_id}:${idx}`;
+                    solution_div.classList.add("solution-text");
 
-                    if (solutions[filename].comment.length != 0)
+                    if (solution.comment.length != 0)
                     {
                         let comment = document.createElement("p");
                         let pre_comment = document.createElement("span");
@@ -394,14 +360,14 @@
                         comment_body.classList.add("comment-body");
 
                         pre_comment.appendChild(document.createTextNode("Комментарий автора: "));
-                        comment_body.appendChild(document.createTextNode(solutions[filename].comment));
+                        comment_body.appendChild(document.createTextNode(solution.comment));
                         comment.appendChild(pre_comment);
                         comment.appendChild(comment_body);
 
-                        solution.appendChild(comment);
+                        solution_div.appendChild(comment);
                     }
 
-                    if (solutions[filename].strategy.length != 0)
+                    if (solution.strategy.length != 0)
                     {
                         let comment = document.createElement("p");
                         let pre_comment = document.createElement("span");
@@ -410,14 +376,14 @@
                         comment_body.classList.add("comment-body", "monotype");
 
                         pre_comment.appendChild(document.createTextNode("Стратегия доказательства: "));
-                        comment_body.appendChild(document.createTextNode(solutions[filename].strategy));
+                        comment_body.appendChild(document.createTextNode(solution.strategy));
                         comment.appendChild(pre_comment);
                         comment.appendChild(comment_body);
 
-                        solution.appendChild(comment);
+                        solution_div.appendChild(comment);
                     }
 
-                    let solution_text = await getSolutionText(filename);
+                    let solution_text = solution.source.source;
 
                     let code_container = document.createElement("div");
                     code_container.classList.add("code-container");
@@ -430,7 +396,7 @@
 
                     let header_filename = document.createElement("span");
                     header_filename.classList.add("code-filename");
-                    header_filename.appendChild(document.createTextNode(filename));
+                    header_filename.appendChild(document.createTextNode(solution.filename));
 
                     let copied_notification = document.createElement("span");
                     copied_notification.classList.add("copied-notification");
@@ -454,7 +420,7 @@
                     let download_symbol = document.createElement("i");
                     download_symbol.classList.add("fa-solid", "fa-download");
                     download_button.appendChild(download_symbol);
-                    download_button.onclick = function() { window.location.href = `./framac_database/solutions/${filename}`; };
+                    download_button.onclick = function() { window.location.href = `./framac_database/solutions/${solution.filename}`; };
 
                     buttons.appendChild(copy_button);
                     buttons.appendChild(download_button);
@@ -469,49 +435,32 @@
                     code_container.appendChild(pre);
                     pre.appendChild(code);
                     code.appendChild(document.createTextNode(solution_text));
-                    task_solutions.appendChild(solution);
+                    task_solutions.appendChild(solution_div);
 
-                    solution.appendChild(code_container);
+                    solution_div.appendChild(code_container);
                 }
 
                 return task_solutions;
             }
 
-            function filter(dict, predicate)
-            {
-                let result = {};
-                
-                for (let key in dict)
-                {
-                    if (predicate(key, dict[key]))
-                        result[key] = dict[key];
-                }
-
-                return result;
-            }
-
-            function empty(dict)
-            {
-                return Object.keys(dict).length == 0;
-            }
-
-            function any(dict, predicate)
-            {
-                let result = false;
-
-                for (key in dict)
-                {
-                    if (predicate(key, dict[key]))
-                        result |= true;
-                }
-
-                return result;
-            }
-
             async function placeTasks()
             {
-                let tasks = await getTasks();
-                let solutions = await getSolutions();
+                let tasks = {}
+                let index = await getSolutions();
+                for (let filename in index)
+                {
+                    solution = {
+                        source: new CParser.CSource(await getSolutionText(filename)),
+                        strategy: index[filename]["strategy"],
+                        comment: index[filename]["comment"],
+                        filename: filename,
+                        accepted: index[filename]["accepted"]
+                    }
+
+                    if (!(solution.source.function_name in tasks))
+                        tasks[solution.source.function_name] = [];
+                    tasks[solution.source.function_name] = tasks[solution.source.function_name].concat(solution);
+                }
 
                 const tasksList = document.getElementById("tasksList");
 
@@ -523,46 +472,26 @@
                 solved_tasks_container_header.appendChild(document.createTextNode("Решенные задачи"));
                 solved_tasks_container.appendChild(solved_tasks_container_header);
 
-                let unsolved_tasks_container = document.createElement("div");
-                unsolved_tasks_container.classList.add("task-container");
-                unsolved_tasks_container.id = "unsolvedTasks";
-                let unsolved_tasks_container_header = document.createElement("p");
-                unsolved_tasks_container_header.classList.add("task-container-header");
-                unsolved_tasks_container_header.appendChild(document.createTextNode("Нерешенные задачи"));
-                unsolved_tasks_container.appendChild(unsolved_tasks_container_header);
-
-                let unsolved_count = 0;
                 let solved_count = 0;
 
-                for (let i = 0; i < tasks.length; i++)
+                for (let task_id in tasks)
                 {
-                    let filtered_solutions = filter(solutions, (key, value) => value.task_id == tasks[i].id);
-                    let solution_exist = !empty(filtered_solutions);
-                    let has_approved_solution = any(filtered_solutions, (key, value) => value.accepted);
+                    let solutions = tasks[task_id];
+                    let has_approved_solution = solutions.some(value => value.accepted);
 
                     let task_container = document.createElement("div");
                     task_container.classList.add("task-container", "singular");
-                    task_container.id = `taskContainer:${i}`;
-                    task_container.appendChild(createTask(tasks[i].name, i, solution_exist, has_approved_solution));
-                    task_container.appendChild(await createTaskText(`${tasks[i].id}.c`, i));
-                    task_container.appendChild(await createTaskSolutions(filtered_solutions, i));
+                    task_container.id = `taskContainer:${task_id}`;
+                    task_container.appendChild(createTask(task_id, has_approved_solution));
+                    task_container.appendChild(createTaskText(solutions[0].source.clear_source, task_id));
+                    task_container.appendChild(createTaskSolutions(solutions, task_id));
 
-                    if (solution_exist)
-                    {
-                        solved_tasks_container.appendChild(task_container);
-                        solved_count++;
-                    }
-                    else
-                    {
-                        unsolved_tasks_container.appendChild(task_container);
-                        unsolved_count++;
-                    }
+                    solved_tasks_container.appendChild(task_container);
+                    solved_count++;
                 }
 
                 if (solved_count > 0)
                     tasksList.appendChild(solved_tasks_container);
-                if (unsolved_count > 0)
-                    tasksList.appendChild(unsolved_tasks_container);
 
                 document.getElementById("loaderProcess").remove();
                 tasksList.style.display = "block";

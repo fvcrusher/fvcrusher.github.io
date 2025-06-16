@@ -1,41 +1,35 @@
 {
     "cocktail_back.c": {
-        "task_id": "cocktail_back_2024",
         "strategy": "Split -> Split -> CVC4 -> Auto level 1 на все не прошедшие по отдельности",
         "comment": "Решение автора FVCrusher",
         "accepted": true
     },
 
     "cocktail_back_2.c": {
-        "task_id": "cocktail_back_2024",
         "strategy": "",
         "comment": "",
         "accepted": false
     },
 
     "mat_minmax5.c": {
-        "task_id": "mat_minmax5",
         "strategy": "",
         "comment": "",
         "accepted": false
     },
 
     "mat_minmax7.c": {
-        "task_id": "mat_minmax5",
         "strategy": "",
         "comment": "",
         "accepted": false
     },
 
     "mat_minmax11.c": {
-        "task_id": "mat_minmax5",
         "strategy": "",
         "comment": "",
         "accepted": false
     },
 
     "shell_rl.c": {
-        "task_id": "shell_rl_2024",
         "strategy": "",
         "comment": "",
         "accepted": false
