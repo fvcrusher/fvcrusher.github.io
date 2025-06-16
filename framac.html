@@ -337,11 +337,9 @@
 
                 task_text.appendChild(code_container);
                 return task_text;
-
-                return task_text;
             }
 
-            // solutions - dict: {<filename> : {"startup_cmd": <startup_cmd>, "comment": <comment>}, ...}
+            // solutions - dict: {<filename> : {"strategy": <strategy>, "comment": <comment>}, ...}
             async function createTaskSolutions(solutions, task_id)
             {
                 let task_solutions = document.createElement("div");
@@ -403,7 +401,7 @@
                         solution.appendChild(comment);
                     }
 
-                    if (solutions[filename].startup_cmd.length != 0)
+                    if (solutions[filename].strategy.length != 0)
                     {
                         let comment = document.createElement("p");
                         let pre_comment = document.createElement("span");
@@ -412,7 +410,7 @@
                         comment_body.classList.add("comment-body", "monotype");
 
                         pre_comment.appendChild(document.createTextNode("Стратегия доказательства: "));
-                        comment_body.appendChild(document.createTextNode(solutions[filename].startup_cmd));
+                        comment_body.appendChild(document.createTextNode(solutions[filename].strategy));
                         comment.appendChild(pre_comment);
                         comment.appendChild(comment_body);
 
