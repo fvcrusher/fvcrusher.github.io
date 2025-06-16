@@ -5,7 +5,7 @@
     <link type="Image/x-icon" href="favicon.ico" rel="icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FVCrusher · SPIN</title>
+    <title>FVCrusher · Frama-C</title>
     <link rel="stylesheet" href="styles.css">
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
@@ -202,17 +202,22 @@
         <script>
             async function getTasks()
             {
-                return (await fetch("./spin_database/tasks.json")).json();
+                return (await fetch("./framac_database/tasks/index.json")).json();
+            }
+
+            async function getTaskText(filename)
+            {
+                return (await fetch(`./framac_database/tasks/${filename}`)).text();
             }
 
             async function getSolutions()
             {
-                return (await fetch("./spin_database/solutions/index.json")).json();
+                return (await fetch("./framac_database/solutions/index.json")).json();
             }
 
             async function getSolutionText(filename)
             {
-                return (await fetch(`./spin_database/solutions/${filename}`)).text();
+                return (await fetch(`./framac_database/solutions/${filename}`)).text();
             }
 
             function createExpandButton(id, text) {
@@ -271,17 +276,68 @@
                 return task;
             }
 
-            function createTaskText(text, task_id)
+            async function createTaskText(filename, task_id)
             {
+                let solution_text = await getTaskText(filename);
+
+                let code_container = document.createElement("div");
+                code_container.classList.add("code-container");
+
+                let header = document.createElement("div");
+                header.classList.add("code-header");
+
+                let buttons = document.createElement("div");
+                buttons.classList.add("source-buttons");
+
+                let header_filename = document.createElement("span");
+                header_filename.classList.add("code-filename");
+                header_filename.appendChild(document.createTextNode(filename));
+
+                let copied_notification = document.createElement("span");
+                copied_notification.classList.add("copied-notification");
+                copied_notification.appendChild(document.createTextNode("Скопировано!"));
+
+                let copy_button = document.createElement("button");
+                copy_button.classList.add("source", "copy");
+                copy_button.title = "Скопировать код в буфер обмена";
+                let copy_symbol = document.createElement("i");
+                copy_symbol.classList.add("fa-solid", "fa-copy");
+                copy_button.appendChild(copy_symbol);
+                copy_button.onclick = function() {
+                    navigator.clipboard.writeText(solution_text);
+                    copied_notification.style.color = "black";
+                    setTimeout(function() { copied_notification.style.color = "transparent"; }, 3000);
+                };
+
+                let download_button = document.createElement("button");
+                download_button.classList.add("source", "download");
+                download_button.title = "Скачать код";
+                let download_symbol = document.createElement("i");
+                download_symbol.classList.add("fa-solid", "fa-download");
+                download_button.appendChild(download_symbol);
+                download_button.onclick = function() { window.location.href = `./framac_database/tasks/${filename}`; };
+
+                buttons.appendChild(copy_button);
+                buttons.appendChild(download_button);
+
+                header.appendChild(header_filename);
+                header.appendChild(copied_notification);
+                header.appendChild(buttons);
+                code_container.appendChild(header);
+
+                let code = document.createElement("code");
+                let pre = document.createElement("pre");
+                code_container.appendChild(pre);
+                pre.appendChild(code);
+                code.appendChild(document.createTextNode(solution_text));
+
                 let task_text = document.createElement("div");
                 task_text.id = `taskText:${task_id}`;
                 task_text.classList.add("task-data", "restore-state");
 
-                let task_par = document.createElement("p");
-                task_par.classList.add("task-text-par");
-                task_par.appendChild(document.createTextNode(text));
+                task_text.appendChild(code_container);
+                return task_text;
 
-                task_text.appendChild(task_par);
                 return task_text;
             }
 
@@ -355,7 +411,7 @@
                         let comment_body = document.createElement("span");
                         comment_body.classList.add("comment-body", "monotype");
 
-                        pre_comment.appendChild(document.createTextNode("Команда запуска spin: "));
+                        pre_comment.appendChild(document.createTextNode("Стратегия доказательства: "));
                         comment_body.appendChild(document.createTextNode(solutions[filename].startup_cmd));
                         comment.appendChild(pre_comment);
                         comment.appendChild(comment_body);
@@ -400,7 +456,7 @@
                     let download_symbol = document.createElement("i");
                     download_symbol.classList.add("fa-solid", "fa-download");
                     download_button.appendChild(download_symbol);
-                    download_button.onclick = function() { window.location.href = `./spin_database/solutions/${filename}`; };
+                    download_button.onclick = function() { window.location.href = `./framac_database/solutions/${filename}`; };
 
                     buttons.appendChild(copy_button);
                     buttons.appendChild(download_button);
@@ -490,7 +546,7 @@
                     task_container.classList.add("task-container", "singular");
                     task_container.id = `taskContainer:${i}`;
                     task_container.appendChild(createTask(tasks[i].name, i, solution_exist, has_approved_solution));
-                    task_container.appendChild(createTaskText(tasks[i].task, i));
+                    task_container.appendChild(await createTaskText(`${tasks[i].id}.c`, i));
                     task_container.appendChild(await createTaskSolutions(filtered_solutions, i));
 
                     if (solution_exist)
