@@ -319,7 +319,7 @@
              *   ...
              * ]
              */
-            function createTaskSolutions(solutions, task_id)
+            function createTaskSolutions(solutions_list, task_id)
             {
                 let task_solutions = document.createElement("div");
                 task_solutions.id = `taskSolutions:${task_id}`;
@@ -328,6 +328,8 @@
                 let variants_row = document.createElement("div");
                 variants_row.classList.add("variants-row");
                 task_solutions.appendChild(variants_row);
+
+                solutions = solutions_list.sort((first, second) => second.accepted - first.accepted);
 
                 for (let idx = 0; idx < solutions.length; idx++)
                 {
