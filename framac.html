@@ -27,6 +27,8 @@
         let CParser = null;
         import("./Lib/c_source.js").then((mod) => CParser = mod);
     </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 </head>
 <body>
     <header>
@@ -294,6 +296,7 @@
                 code_container.appendChild(header);
 
                 let code = document.createElement("code");
+                code.classList.add("language-c");
                 let pre = document.createElement("pre");
                 code_container.appendChild(pre);
                 pre.appendChild(code);
@@ -433,6 +436,7 @@
                     code_container.appendChild(header);
 
                     let code = document.createElement("code");
+                    code.classList.add("language-c");
                     let pre = document.createElement("pre");
                     code_container.appendChild(pre);
                     pre.appendChild(code);
@@ -497,6 +501,7 @@
                     tasksList.appendChild(solved_tasks_container);
 
                 document.getElementById("loaderProcess").remove();
+                hljs.highlightAll();
                 tasksList.style.display = "block";
             }
 
