@@ -477,14 +477,6 @@
 
                 const tasksList = document.getElementById("tasksList");
 
-                let solved_tasks_container = document.createElement("div");
-                solved_tasks_container.classList.add("task-container");
-                solved_tasks_container.id = "solvedTasks";
-                let solved_tasks_container_header = document.createElement("p");
-                solved_tasks_container_header.classList.add("task-container-header");
-                solved_tasks_container_header.appendChild(document.createTextNode("Решенные задачи"));
-                solved_tasks_container.appendChild(solved_tasks_container_header);
-
                 let solved_count = 0;
 
                 for (let task_id in tasks)
@@ -500,12 +492,9 @@
                     task_container.appendChild(createTaskText(solutions[0].source.clear_source, task_id));
                     task_container.appendChild(createTaskSolutions(solutions, task_id));
 
-                    solved_tasks_container.appendChild(task_container);
+                    tasksList.appendChild(task_container);
                     solved_count++;
                 }
-
-                if (solved_count > 0)
-                    tasksList.appendChild(solved_tasks_container);
 
                 document.getElementById("loaderProcess").remove();
                 hljs.highlightAll();
