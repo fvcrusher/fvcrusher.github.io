@@ -53,5 +53,11 @@
         "startup_cmd": "spin -run -i 10_1.pml",
         "comment": "",
         "accepted": true
+    },
+    "6.pml": {
+        "task_id": "father_and_sons_2024",
+        "startup_cmd": "spin -run -i 6.pml",
+        "comment": "",
+        "accepted": true
     }
 }

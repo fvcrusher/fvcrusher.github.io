@@ -17,6 +17,12 @@
         "accepted": false
     },
 
+    "gnome_lr.c": {
+        "strategy": "",
+        "comment": "",
+        "accepted": true
+    },
+
     "shell_rl.c": {
         "strategy": "",
         "comment": "",
