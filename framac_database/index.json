@@ -5,6 +5,12 @@
         "accepted": true
     },
 
+    "cocktail_fwd.c": {
+        "strategy": "",
+        "comment": "",
+        "accepted": false
+    },
+
     "cocktail_back_2.c": {
         "strategy": "",
         "comment": "",
@@ -17,6 +23,12 @@
         "accepted": false
     },
 
+    "mat_minmax3.c": {
+        "strategy": "",
+        "comment": "",
+        "accepted": false
+    },
+    
     "mat_minmax5.c": {
         "strategy": "",
         "comment": "",
