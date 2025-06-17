@@ -291,8 +291,14 @@
 
                 buttons.appendChild(copy_button);
 
+                let header_filename = document.createElement("span");
+                header_filename.classList.add("code-filename");
+                header_filename.appendChild(document.createTextNode("Задание"));
+
+                header.appendChild(header_filename);
                 header.appendChild(copied_notification);
                 header.appendChild(buttons);
+
                 code_container.appendChild(header);
 
                 let code = document.createElement("code");
