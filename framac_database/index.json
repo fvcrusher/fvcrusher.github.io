@@ -11,6 +11,12 @@
         "accepted": false
     },
 
+    "shell_rl.c": {
+        "strategy": "",
+        "comment": "",
+        "accepted": false
+    },
+
     "mat_minmax5.c": {
         "strategy": "",
         "comment": "",
@@ -24,12 +30,6 @@
     },
 
     "mat_minmax11.c": {
-        "strategy": "",
-        "comment": "",
-        "accepted": false
-    },
-
-    "shell_rl.c": {
         "strategy": "",
         "comment": "",
         "accepted": false

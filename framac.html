@@ -229,10 +229,10 @@
                 return button;
             }
 
-            function createTask(task_name, has_approved_solution=null)
+            function createTask(task_name, task_id, has_approved_solution=null)
             {
                 let task = document.createElement("p");
-                task.id = `task:${task_name}`;
+                task.id = `task:${task_id}`;
                 task.classList.add("task-header", "restore-state");
 
                 let name = document.createElement("span");
@@ -252,9 +252,9 @@
                 task.appendChild(buttons);
                 buttons.classList.add("task-buttons");
 
-                let text_button = createExpandButton(`expandTask:${task_name}`, "Условие");
+                let text_button = createExpandButton(`expandTask:${task_id}`, "Условие");
                 buttons.appendChild(text_button);
-                let solutions_button = createExpandButton(`expandSolutions:${task_name}`, "Решения");
+                let solutions_button = createExpandButton(`expandSolutions:${task_id}`, "Решения");
                 buttons.appendChild(solutions_button);
 
                 return task;
@@ -456,12 +456,12 @@
                         strategy: index[filename]["strategy"],
                         comment: index[filename]["comment"],
                         filename: filename,
-                        accepted: index[filename]["accepted"]
+                        accepted: index[filename]["accepted"],
                     }
 
-                    if (!(solution.source.function_name in tasks))
-                        tasks[solution.source.function_name] = [];
-                    tasks[solution.source.function_name] = tasks[solution.source.function_name].concat(solution);
+                    if (!(solution.source.source_id in tasks))
+                        tasks[solution.source.source_id] = [];
+                    tasks[solution.source.source_id] = tasks[solution.source.source_id].concat(solution);
                 }
 
                 const tasksList = document.getElementById("tasksList");
@@ -480,11 +480,12 @@
                 {
                     let solutions = tasks[task_id];
                     let has_approved_solution = solutions.some(value => value.accepted);
+                    let task_name = solutions[0].source.function_name;
 
                     let task_container = document.createElement("div");
                     task_container.classList.add("task-container", "singular");
                     task_container.id = `taskContainer:${task_id}`;
-                    task_container.appendChild(createTask(task_id, has_approved_solution));
+                    task_container.appendChild(createTask(task_name, task_id, has_approved_solution));
                     task_container.appendChild(createTaskText(solutions[0].source.clear_source, task_id));
                     task_container.appendChild(createTaskSolutions(solutions, task_id));
 
