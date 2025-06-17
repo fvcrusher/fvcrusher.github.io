@@ -909,3 +909,8 @@ input.filter {
     background-color: transparent;
     outline: none;
 }
+
+.reveal pre code, .hljs {
+    background-color: transparent !important;
+    padding: 0 !important;
+}
