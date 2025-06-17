@@ -367,6 +367,16 @@ ul {
     display: none;
 }
 
+span.copied-notification {
+    display: none;
+    margin: auto 0px;
+    padding: 0px 10px;
+    color: transparent;
+    cursor: default;
+    user-select: none;
+    transition: color 0.3s;
+}
+
 @media (min-width: 601px) 
 {
     .footer-link-text {
@@ -393,6 +403,10 @@ ul {
         background-color: #ededed;
         border: 1px solid #ccc;
         border-radius: 5px;
+    }
+
+    span.copied-notification {
+        display: block;
     }
 }
 
@@ -832,15 +846,6 @@ span.code-filename {
     padding: 0px 10px;
     font-weight: bold;
     font-family: monospace;
-}
-
-span.copied-notification {
-    margin: auto 0px;
-    padding: 0px 10px;
-    color: transparent;
-    cursor: default;
-    user-select: none;
-    transition: color 0.3s;
 }
 
 p.missing-solution-warning {
