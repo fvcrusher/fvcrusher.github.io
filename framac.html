@@ -449,9 +449,10 @@
                 return task_solutions;
             }
 
+            let tasks = {}
+
             async function placeTasks()
             {
-                let tasks = {}
                 let index = await getSolutions();
                 for (let filename in index)
                 {
