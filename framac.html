@@ -95,7 +95,7 @@
                             return node.textContent.toLowerCase().includes(filter_str);
                     }
 
-                    function filterTasksInContainer(container, regex_mode, filter_str) {
+                    function filterTasksInContainer(regex_mode, filter_str) {
                         let tasks = container.getElementsByClassName("task-container");
                         
                         let shown_count = 0;
@@ -122,12 +122,16 @@
                         if (!regexMode)
                             filter_str = filter_str.toLowerCase().trim();
 
-                        let solved = document.getElementById("solvedTasks");
-                        let unsolved = document.getElementById("unsolvedTasks");
-                        if (solved != null)
-                            filterTasksInContainer(solved, regexMode, filter_str);
-                        if (unsolved != null)
-                            filterTasksInContainer(unsolved, regexMode, filter_str);
+                        let tasksList = document.getElementById("tasksList");
+                        let tasks = tasksList.getElementsByClassName("task-container");
+                        
+                        for (let i = 0; i < tasks.length; i++)
+                        {
+                            if (emptyString(filter_str) || satisfiesFilter(tasks[i], regexMode, filter_str))
+                                tasks[i].style.removeProperty("display");
+                            else
+                                tasks[i].style.setProperty("display", "none");
+                        }
                     }
 
                     document.getElementById("filterValue").addEventListener("input", filterTasks);
