@@ -30,12 +30,16 @@
             name: 'Promela',
             aliases: ['pml'],
             keywords: {
-            keyword:
-                'if fi do od for else break goto return skip atomic d_step timeout unless ' +
-                'proctype inline init active run assert print chan len ' +
-                'typedef mtype bool byte short int unsigned',
-            literal:
-                'true false'
+                keywords: {
+                    keyword: "accept active assert assign atomic break " + 
+                        "c_code c_decl c_state c_track c_expr " +
+                        "if fi do od for else goto return skip d_step timeout unless " +
+                        "proctype inline init run print ltl",
+                    type:
+                        'chan bit bool byte pid short int unsigned',
+                    literal:
+                        'true false _last _pid _nr_pr'
+                }
             },
             contains: [
                 hljs.C_LINE_COMMENT_MODE,
