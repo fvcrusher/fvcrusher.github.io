@@ -59,5 +59,11 @@
         "startup_cmd": "spin -run -i 6.pml",
         "comment": "",
         "accepted": true
+    },
+    "22.pml": {
+        "task_id": "magic_square_2024",
+        "startup_cmd": "spin -run -i 22.pml",
+        "comment": "",
+        "accepted": true
     }
 }
