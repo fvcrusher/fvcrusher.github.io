@@ -514,8 +514,10 @@ input:checked + .slider:before {
 }
 
 .switch-container {
-    width: fit-content;
-    min-width: max-content;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .robdd-settings {
@@ -918,4 +920,8 @@ input.filter {
 .reveal pre code, .hljs {
     background-color: transparent !important;
     padding: 0 !important;
+}
+
+input:placeholder-shown {
+    text-overflow: ellipsis;
 }
