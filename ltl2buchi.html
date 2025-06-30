@@ -22,6 +22,8 @@
         });
     </script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
 </head>
 <body>
@@ -149,6 +151,13 @@
                         <span class="slider round"></span>
                     </label>
                     <span>Инвертировать порядок перебора</span>
+                </div>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input id="generateGraph" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Построить граф автомата Бюхи (время может увеличиться)</span>
                 </div>
             </div>
 
@@ -294,6 +303,7 @@
         function run_solver() {
             const inputField = document.getElementById("textInput");
             const compactFlag = document.getElementById("compactTable");
+            const drawGraphFlag = document.getElementById("generateGraph");
             const inversedFlag = document.getElementById("inversedMask");
             const outputDiv = document.getElementById("output");
 
@@ -371,6 +381,20 @@
                 let edges = solver.edges[i];
                 let value = (edges.length == 0) ? "\$\\emptyset\$" : `\$ \\{\$ ${solver.edges[i].map((state_no) => `\$s_{${state_no + 1}}`).join(",$ ")}\$ \$\\} \$`;
                 add_paragraph(outputDiv, `${definition} \$=\$ ${declaration} \$=\$ ${value}`, true);
+            }
+
+            if (drawGraphFlag.checked)
+            {
+                add_paragraph(outputDiv, "Граф автомата Бюхи не нужен в решении задачи, однако может быть полезен для проверки правильности и при отладке необязательных практикумов.");
+
+                let graph_container = document.createElement("div");
+                graph_container.classList.add("generated-output", "wide-output", "buchi-automaton");
+                graph_container.id = "graph-container";
+
+                const viz = new Viz();
+                viz.renderSVGElement(solver.buchi_graph).then(element => { element.id = "generated-graph"; element.classList.add("generated-graph"); graph_container.appendChild(element); })
+
+                outputDiv.appendChild(graph_container);
             }
 
             outputDiv.style.display = "block";
