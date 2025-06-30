@@ -850,6 +850,32 @@ export class Solver
 
         return parsed_ltl.errors;
     }
+
+    get buchi_graph()
+    {
+        let dot_text = `digraph G { rankdir=LR; bgcolor="transparent"; layout=circo\n`;
+        for (let state_no = 0; state_no < this.states_count; state_no++)
+        {
+            let is_initial = this.#initial_states.some(st => st == state_no);
+            let is_acceptable = this.#acceptable_states.some(lst => lst.some(st => st == state_no));
+            dot_text += `\tstate${state_no} [label=${state_no}, shape=${is_acceptable ? "doublecircle" : "circle"}]\n`;
+            if (is_initial)
+            {
+                dot_text += `\tdummy${state_no} [label=DUMMY, style=invis]\n`;
+                dot_text += `\tdummy${state_no} -> state${state_no}\n`;
+            }
+        }
+
+        for (let state_no = 0; state_no < this.states_count; state_no++)
+        {
+            for (let target_state_no of this.edges[state_no])
+                dot_text += `\tstate${state_no} -> state${target_state_no}\n`;
+        }
+
+        dot_text += "}\n";
+
+        return dot_text;
+    }
 }
 
 // let solver = new Solver();
