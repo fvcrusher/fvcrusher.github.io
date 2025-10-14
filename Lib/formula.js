@@ -38,6 +38,8 @@ class Formula
             case Formula.Operator.U: return latex ? " \\hspace{0.1cm}\\mathbf{U}\\hspace{0.1cm} " : " U ";
             case Formula.Operator.R: return latex ? " \\hspace{0.1cm}\\mathbf{W}\\hspace{0.1cm} " : " R ";
             case Formula.Operator.W: return latex ? " \\hspace{0.1cm}\\mathbf{R}\\hspace{0.1cm} " : " W ";
+            case Formula.Operator.EQUALS: return latex ? " \\hspace{0.1cm}=\\hspace{0.1cm} " : " == ";
+            case Formula.Operator.NOT_EQUALS: return latex ? " \\hspace{0.1cm}\\neq\\hspace{0.1cm} " : " != ";
             default: return "?";
         }
     }
@@ -90,6 +92,8 @@ class Formula
             case Formula.Operator.U:
             case Formula.Operator.W:
             case Formula.Operator.R:
+            case Formula.Operator.EQUALS:
+            case Formula.Operator.NOT_EQUALS:
                 return Formula.binary(other.opc, Formula.copy(other.lop), Formula.copy(other.rop));
 
             case Formula.Operator.ERROR_NODE:
@@ -115,6 +119,9 @@ class Formula
             U: 11,
             W: 12,
             R: 13,
+            FUNCTION: 14,
+            EQUALS: 15,
+            NOT_EQUALS: 16,
             ERROR_NODE: -1
         }
     );
@@ -124,7 +131,9 @@ class Formula
         Formula.Operator.OR,
         Formula.Operator.XOR,
         Formula.Operator.IMPL,
-        Formula.Operator.NOT
+        Formula.Operator.NOT,
+        Formula.Operator.EQUALS,
+        Formula.Operator.NOT_EQUALS
     ];
 
     static LTLOperators = [
@@ -138,11 +147,14 @@ class Formula
         Formula.Operator.G,
         Formula.Operator.U,
         Formula.Operator.W,
-        Formula.Operator.R
+        Formula.Operator.R,
+        Formula.Operator.EQUALS,
+        Formula.Operator.NOT_EQUALS
     ]
 
     lop = null;
     rop = null;
+    oplist = null;
     opc = null;
     name = null;
 
@@ -165,6 +177,7 @@ class Formula
     {
         this.lop = other.lop;
         this.rop = other.rop;
+        this.oplist = other.oplist;
         this.opc = other.opc;
         this.name = other.name;
         this.#error_info = other.#error_info;
@@ -192,6 +205,14 @@ class Formula
         let node = new Formula(opc);
         node.lop = l_operand;
         node.rop = r_operand;
+        return node;
+    }
+
+    static function(name, operands)
+    {
+        let node = new Formula(Formula.Operator.FUNCTION);
+        node.name = name;
+        node.oplist = operands;
         return node;
     }
 
@@ -319,8 +340,15 @@ class Formula
             case Formula.Operator.U:
             case Formula.Operator.W:
             case Formula.Operator.R:
+            case Formula.Operator.EQUALS:
+            case Formula.Operator.NOT_EQUALS:
                 let res = `${this.lop.#to_string_internal(wrap_lop, latex, compact, compact_not, definitions, announce)}${Formula.text_of(this.opc, latex, compact)}${this.rop.#to_string_internal(wrap_rop, latex, compact, compact_not, definitions, announce)}`;
                 str += (wrap ? `(${res})` : res);
+                break;
+
+            case Formula.Operator.FUNCTION:
+                let operands = this.oplist.map(operand => operand.#to_string_internal(wrap_lop, latex, compact, compact_not, definitions, announce)).join(", ");
+                str += `${this.name}(${operands})`;
                 break;
 
             case Formula.Operator.ERROR_NODE:
@@ -403,7 +431,9 @@ class Formula
             opc == Formula.Operator.IMPL ||
             opc == Formula.Operator.U ||
             opc == Formula.Operator.W ||
-            opc == Formula.Operator.R
+            opc == Formula.Operator.R ||
+            opc == Formula.Operator.EQUALS ||
+            opc == Formula.Operator.NOT_EQUALS
         );
     }
 
