@@ -342,7 +342,9 @@
             }
             add_paragraph(outputDiv, transformation_steps, true);
             add_paragraph(outputDiv, `В полученной формуле необходимо выделить независимые подформулы (переменные и операции $\\mathbf{X}$). Таких подформул ${solver.variables_count}: ${solver.variables.map((variable) => `\$${variable.latex}\$`).join(", ")}. Составим таблицу истинности с расщеплениями. В случае, если в формуле несколько операций $\\mathbf{U}$, таблица может быть слишком широкой, не забывайте про горизонтальную прокрутку.`);
-            
+            if (compactFlag.checked)
+                add_paragraph(outputDiv, "Таблица была записана в компактном виде. Это значит что вместо записи полного множества истинности были записаны только отличия от предыдущего шага. Так, например, если множество было $p, q$, а позже расщепилось на $p, q, \\mathbf{\\neg} p$ и $p, q, \\mathbf{X} q$, то в таблице множества будут записаны в виде изменений $+ \\mathbf{\\neg} p$ и $+ \\mathbf{X} q$ соответственно. Такой трюк нормально проходит на КР и позволяет сильно экономить время.");
+
             let table = generate_table(solver, compactFlag.checked);
             add_paragraph(outputDiv, table);
 
